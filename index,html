@@ -9,6 +9,8 @@
 </head>
 <body>
     <h1>Truckero Front</h1>
+<h1>Truckero Front</h1> 
+
     <p>Frontend funcionando desde GitHub Pages.</p>
 
     <button onclick="probarFetch()">Probar fetch → doPost</button>
