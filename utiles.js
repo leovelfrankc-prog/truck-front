@@ -1,41 +1,175 @@
-const API_URL =
-  "https://script.google.com/macros/s/TU_DEPLOYMENT_ID/exec";
+/**
+ * ==========================================
+ * TRUCKERO - UTILES.JS
+ * ==========================================
+ */
 
-async function apiFetch({
-  modulo,
-  accion,
-  tokenFirmado,
-  payload = {}
-}) {
+/**
+ * Configuración global
+ */
+const CONFIG = {
 
-  try {
+    API_URL:
+        "https://script.google.com/macros/s/TU_DEPLOYMENT_ID/exec"
 
-    const response = await fetch(API_URL, {
-      method: "POST",
-      headers: {
-        "Content-Type": "text/plain;charset=utf-8"
-      },
-      body: JSON.stringify({
-        modulo,
-        accion,
-        tokenFirmado,
-        payload
-      })
-    });
+};
 
-    const data = await response.json();
+/**
+ * ==========================================
+ * SESSION
+ * ==========================================
+ */
 
-    return data;
+const Session = {
 
-  } catch (error) {
+    getToken() {
 
-    console.error("apiFetch:", error);
+        return localStorage.getItem(
+            "tokenFirmado"
+        );
 
-    return {
-      ok: false,
-      error: error.message
-    };
+    },
 
-  }
+    setToken(token) {
+
+        localStorage.setItem(
+            "tokenFirmado",
+            token
+        );
+
+    },
+
+    clear() {
+
+        localStorage.removeItem(
+            "tokenFirmado"
+        );
+
+    },
+
+    exists() {
+
+        return !!localStorage.getItem(
+            "tokenFirmado"
+        );
+
+    }
+
+};
+
+/**
+ * ==========================================
+ * BOOTSTRAP TOKEN
+ * ==========================================
+ *
+ * Lee el token de la URL y lo guarda
+ * localmente para futuras aperturas
+ *
+ * Ejemplo:
+ *
+ * ?token=ABC123
+ *
+ */
+
+function bootstrapToken() {
+
+    const params =
+        new URLSearchParams(
+            window.location.search
+        );
+
+    const token =
+        params.get("token");
+
+    if (token) {
+
+        Session.setToken(token);
+
+        console.log(
+            "Token almacenado en sesión local"
+        );
+
+    }
 
 }
+
+/**
+ * ==========================================
+ * API FETCH
+ * ==========================================
+ */
+
+async function apiFetch({
+    modulo,
+    accion,
+    tokenFirmado,
+    payload = {}
+}) {
+
+    try {
+
+        const body = {
+
+            requestId:
+                crypto.randomUUID(),
+
+            modulo,
+            accion,
+            tokenFirmado,
+            payload
+
+        };
+
+        const response =
+            await fetch(
+                CONFIG.API_URL,
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type":
+                        "text/plain;charset=utf-8"
+                    },
+                    body: JSON.stringify(
+                        body
+                    )
+                }
+            );
+
+        const data =
+            await response.json();
+
+        return data;
+
+    } catch (error) {
+
+        console.error(
+            "apiFetch:",
+            error
+        );
+
+        return {
+
+            ok: false,
+
+            error:
+                error.message ||
+
+                "Error de comunicación"
+
+        };
+
+    }
+
+}
+
+/**
+ * ==========================================
+ * ARRANQUE INICIAL
+ * ==========================================
+ *
+ * Guarda token de la URL
+ * y deja disponible la sesión
+ *
+ */
+
+bootstrapToken();
