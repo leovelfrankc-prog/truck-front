@@ -2,9 +2,11 @@
   "name": "Truckero",
   "short_name": "Truckero",
   "start_url": "./",
+  "scope": "./",
   "display": "standalone",
+  "orientation": "portrait",
   "background_color": "#ffffff",
-  "theme_color": "#000000",
+  "theme_color": "#2563eb",
   "icons": [
     {
       "src": "icono32.png",
