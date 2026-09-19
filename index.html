@@ -1,45 +1,41 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Truckero Front</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Truckero</title>
+<meta name="theme-color" content="#2563eb">
+    <!-- Favicon tradicional (navegadores de escritorio) -->
+<link rel="icon" href="favicon.ico" type="image/x-icon">
 
-    <link rel="manifest" href="manifest.json">
+<!-- Icono formato WebP rápido -->
+<link rel="icon" href="truckero-icon.webp" type="image/webp">
+
+<!-- Icono para dispositivos Apple / PWA -->
+<link rel="apple-touch-icon" href="truckero-icon-512x512.png">
+<link rel="manifest" href="manifest.json">
 </head>
 <body>
-    <h1>Truckero Front</h1>
-<h1>Truckero Front</h1> 
-
-    <p>Frontend funcionando desde GitHub Pages.</p>
-
-    <button onclick="probarFetch()">Probar fetch → doPost</button>
-
-    <script>
-        // Ajuste en el frontend (index.html)
-async function probarFetch() {
-  try {
-    const res = await fetch("https://script.google.com/macros/s/AKfycbwQtcRhdQRXwxL9IXUtBoA2_VJfGsTRtB-dDO9NUoxv7ujK-4wKHexTiBmEaeQy2FUmZA/exec", {
-      method: "POST",
-      headers: {
-        "Content-Type": "text/plain;charset=utf-8" // 👈 Agrega este encabezado
-      },
-      body: JSON.stringify({ mensaje: "Hola desde GitHub Pages" })
-    });
-
-    const json = await res.json();
-    console.log(json);
-    alert(JSON.stringify(json));
-  } catch (error) {
-    console.error("Error al conectar:", error);
-  }
+<main id="vistas">
+<div>Cargando...</div>
+</main>
+<script src="utiles.js"></script>
+<script src="router.js"></script>
+<script src="controller.js"></script>
+<script src="listeners.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', async () => {
+try {
+if ('serviceWorker' in navigator) {
+await navigator.serviceWorker.register('./sw.js');
+console.log('Service Worker registrado');
 }
-    </script>
-
-    <script>
-        if ("serviceWorker" in navigator) {
-            navigator.serviceWorker.register("sw.js");
-        }
-    </script>
+router('inicio');
+} catch(error) {
+console.error(error);
+document.getElementById('vistas').innerHTML = 'Error iniciando Truckero';
+}
+});
+</script>
 </body>
 </html>
