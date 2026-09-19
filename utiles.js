@@ -10,7 +10,7 @@
 const CONFIG = {
 
     API_URL:
-        "https://script.google.com/macros/s/TU_DEPLOYMENT_ID/exec"
+        "https://script.google.com/macros/s/AKfycbx0WTI9ZLEC_ArJdkjYHplPSjXy3Xthc289eBaK894tC4ZREbrRaL_1IandKCaSYOZ85w/exec"
 
 };
 
