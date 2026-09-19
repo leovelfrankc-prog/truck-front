@@ -9,17 +9,17 @@
   "theme_color": "#2563eb",
   "icons": [
     {
-      "src": "favicon.ico",
+      "src": "icon32.png",
       "sizes": "32x32",
       "type": "image/png"
     },
     {
-      "src": "truckero-icon.webp",
+      "src": "icon192.png",
       "sizes": "192x192",
       "type": "image/png"
     },
     {
-      "src": "truckero-icon-512x512.png",
+      "src": "icon512.png",
       "sizes": "512x512",
       "type": "image/png"
     }
