@@ -18,33 +18,41 @@
     <script src="listeners.js"></script>
 
     <script>
+        function mostrarError(titulo, contenido) {
+            const vistas = document.getElementById('vistas');
+            vistas.innerHTML = `<div style='padding:20px;font-family:monospace;color:#b91c1c;white-space:pre-wrap;word-break:break-word;'>${titulo}\n\n${contenido}</div>`;
+        }
+
+        window.onerror = function(mensaje, archivo, linea, columna, error) {
+            mostrarError('ERROR JAVASCRIPT', `Mensaje: ${mensaje}\n\nArchivo: ${archivo}\n\nLínea: ${linea}\n\nColumna: ${columna}\n\nStack:\n${error?.stack || 'No disponible'}`);
+            return true;
+        };
+
+        window.addEventListener('unhandledrejection', event => {
+            mostrarError('ERROR PROMESA', event.reason?.stack || JSON.stringify(event.reason, null, 2) || String(event.reason));
+        });
+
         document.addEventListener('DOMContentLoaded', async () => {
             try {
-
-                // 1. Capturar token desde la URL
                 const params = new URLSearchParams(window.location.search);
                 const token = params.get('token');
 
-                // 2. Guardar token en localStorage
                 if (token) {
                     Session.setToken(token);
+                    console.log('Token guardado');
                 }
 
-                // 3. Registrar Service Worker
                 if ('serviceWorker' in navigator) {
                     await navigator.serviceWorker.register('./sw.js');
                     console.log('Service Worker registrado');
                 }
 
-                // 4. Recuperar token almacenado
                 const tokenFirmado = Session.getToken();
+                document.getElementById('vistas').innerHTML = `<pre style='padding:15px;font-size:12px;white-space:pre-wrap;'>URL:\n${location.href}\n\nTOKEN URL:\n${token}\n\nTOKEN STORAGE:\n${tokenFirmado}</pre>`;
 
-                // 5. Navegar al login pasando el token
-                router('login', tokenFirmado);
-
+                await router('login', tokenFirmado);
             } catch (error) {
-                console.error(error);
-                document.getElementById('vistas').innerHTML = 'Error iniciando Truckero';
+                mostrarError('ERROR INICIANDO TRUCKERO', error?.stack || error?.message || String(error));
             }
         });
     </script>
