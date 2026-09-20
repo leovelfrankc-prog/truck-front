@@ -1,33 +1,52 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Truckero</title>
-<meta name="theme-color" content="#2563eb">
-   <link rel="manifest" href="manifest.json">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Truckero</title>
+    <meta name="theme-color" content="#2563eb">
+    <link rel="manifest" href="manifest.json">
 </head>
 <body>
-<main id="vistas">
-<div>Cargando...</div>
-</main>
-<script src="utiles.js"></script>
-<script src="router.js"></script>
-<script src="controller.js"></script>
-<script src="listeners.js"></script>
-<script>
-document.addEventListener('DOMContentLoaded', async () => {
-try {
-if ('serviceWorker' in navigator) {
-await navigator.serviceWorker.register('./sw.js');
-console.log('Service Worker registrado');
-}
-router('inicio');
-} catch(error) {
-console.error(error);
-document.getElementById('vistas').innerHTML = 'Error iniciando Truckero';
-}
-});
-</script>
+    <main id="vistas">
+        <div>Cargando...</div>
+    </main>
+
+    <script src="utiles.js"></script>
+    <script src="router.js"></script>
+    <script src="controller.js"></script>
+    <script src="listeners.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+
+                // 1. Capturar token desde la URL
+                const params = new URLSearchParams(window.location.search);
+                const token = params.get('token');
+
+                // 2. Guardar token en localStorage
+                if (token) {
+                    Session.setToken(token);
+                }
+
+                // 3. Registrar Service Worker
+                if ('serviceWorker' in navigator) {
+                    await navigator.serviceWorker.register('./sw.js');
+                    console.log('Service Worker registrado');
+                }
+
+                // 4. Recuperar token almacenado
+                const tokenFirmado = Session.getToken();
+
+                // 5. Navegar al login pasando el token
+                router('login', tokenFirmado);
+
+            } catch (error) {
+                console.error(error);
+                document.getElementById('vistas').innerHTML = 'Error iniciando Truckero';
+            }
+        });
+    </script>
 </body>
 </html>
