@@ -34,23 +34,37 @@
 
         document.addEventListener('DOMContentLoaded', async () => {
             try {
+                // 1. Capturar el token desde la URL de forma síncrona
                 const params = new URLSearchParams(window.location.search);
-                const token = params.get('token');
+                const tokenUrl = params.get('token');
 
-                if (token) {
-                    Session.setToken(token);
-                    console.log('Token guardado');
+                // 2. Si viene un token en la URL, guardarlo inmediatamente
+                if (tokenUrl) {
+                    Session.setToken(tokenUrl);
+                    console.log('Token guardado desde URL');
+
+                    // Limpiar la URL de la barra de direcciones para evitar fallos de PWA en iOS y Android
+                    const cleanUrl = window.location.origin + window.location.pathname;
+                    window.history.replaceState({}, document.title, cleanUrl);
                 }
 
+                // 3. Registrar Service Worker en segundo plano (SIN bloquear el flujo principal con await)
                 if ('serviceWorker' in navigator) {
-                    await navigator.serviceWorker.register('./sw.js');
-                    console.log('Service Worker registrado');
+                    navigator.serviceWorker.register('./sw.js')
+                        .then(() => console.log('Service Worker registrado'))
+                        .catch(err => console.warn('Error al registrar Service Worker:', err));
                 }
 
-                const tokenFirmado = Session.getToken();
-                document.getElementById('vistas').innerHTML = `<pre style='padding:15px;font-size:12px;white-space:pre-wrap;'>URL:\n${location.href}\n\nTOKEN URL:\n${token}\n\nTOKEN STORAGE:\n${tokenFirmado}</pre>`;
+                // 4. Fallback de recuperación: Usar la variable en memoria si localStorage devuelve null en iOS
+                const tokenStorage = Session.getToken();
+                const tokenFirmado = tokenUrl || tokenStorage;
 
+                // 5. Panel de depuración visual para verificar estado en móvil
+                document.getElementById('vistas').innerHTML = `<pre style='padding:15px;font-size:12px;white-space:pre-wrap;'>URL:\n${location.href}\n\nTOKEN URL:\n${tokenUrl}\n\nTOKEN STORAGE:\n${tokenStorage}\n\nTOKEN FINAL:\n${tokenFirmado}</pre>`;
+
+                // 6. Ejecutar router pasando el token válido
                 await router('login', tokenFirmado);
+
             } catch (error) {
                 mostrarError('ERROR INICIANDO TRUCKERO', error?.stack || error?.message || String(error));
             }
