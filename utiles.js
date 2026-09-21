@@ -22,41 +22,81 @@ const CONFIG = {
 
 const Session = {
 
-    getToken() {
+    setToken(token) {
+        if (!token) return;
 
-        return localStorage.getItem(
-            "tokenFirmado"
-        );
+        // 1. Intentar localStorage
+        try {
+            localStorage.setItem("tokenFirmado", token);
+        } catch (e) {
+            console.warn("localStorage no disponible:", e);
+        }
 
+        // 2. Intentar sessionStorage
+        try {
+            sessionStorage.setItem("tokenFirmado", token);
+        } catch (e) {
+            console.warn("sessionStorage no disponible:", e);
+        }
+
+        // 3. Respaldo por Cookie nativa para iOS Safari (expira en 30 días)
+        try {
+            const d = new Date();
+            d.setTime(d.getTime() + (30 * 24 * 60 * 60 * 1000));
+            document.cookie = `tokenFirmado=${encodeURIComponent(token)}; expires=${d.toUTCString()}; path=/; SameSite=Lax; Secure`;
+        } catch (e) {
+            console.warn("Cookie no disponible:", e);
+        }
     },
 
-    setToken(token) {
+    getToken() {
+        let token = null;
 
-        localStorage.setItem(
-            "tokenFirmado",
-            token
-        );
+        // 1. Intentar localStorage
+        try {
+            token = localStorage.getItem("tokenFirmado");
+        } catch (e) {}
 
+        // 2. Si falla en iOS, probar sessionStorage
+        if (!token) {
+            try {
+                token = sessionStorage.getItem("tokenFirmado");
+            } catch (e) {}
+        }
+
+        // 3. Si falla, recuperar desde la Cookie nativa
+        if (!token) {
+            try {
+                const match = document.cookie.match(/(?:^|; )tokenFirmado=([^;]*)/);
+                if (match) {
+                    token = decodeURIComponent(match[1]);
+                }
+            } catch (e) {}
+        }
+
+        return token;
     },
 
     clear() {
+        // Limpiar en los 3 mecanismos de almacenamiento
+        try {
+            localStorage.removeItem("tokenFirmado");
+        } catch (e) {}
 
-        localStorage.removeItem(
-            "tokenFirmado"
-        );
+        try {
+            sessionStorage.removeItem("tokenFirmado");
+        } catch (e) {}
 
+        try {
+            document.cookie = "tokenFirmado=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; SameSite=Lax; Secure";
+        } catch (e) {}
     },
 
     exists() {
-
-        return !!localStorage.getItem(
-            "tokenFirmado"
-        );
-
+        return !!this.getToken();
     }
 
 };
-
 /**
  * ==========================================
  * BOOTSTRAP TOKEN
