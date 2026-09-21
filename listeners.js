@@ -3,35 +3,58 @@
  * LISTENERS UNIVERSALES TRUCKERO
  * ==================================================
  *
- * Convención:
+ * Ejemplos:
  *
  * data-modulo="empresa"
- * data-accion="crearEmpresa"
+ * data-accion="registrar"
  *
- * genera:
+ * Ejecuta:
  *
- * empresacrearEmpresa(info)
+ * window.empresa.registrar(info)
  *
  * --------------------------------------------------
  */
 
 (() => {
 
-    /**
-     * Ejecuta la función modulo+accion
-     */
+    // ==================================================
+    // EJECUTAR FUNCIÓN DEL MÓDULO
+    // ==================================================
     function ejecutarFuncion(modulo, accion, info) {
 
-        const nombreFuncion =
-            `${modulo}${accion}`;
+        const objetoModulo = window[modulo];
 
-        const funcion =
-            window[nombreFuncion];
-
-        if (typeof funcion !== "function") {
+        if (!objetoModulo) {
 
             console.warn(
-                `Función no encontrada: ${nombreFuncion}`
+                `[LISTENER] Módulo no encontrado: ${modulo}`
+            );
+
+            return;
+        }
+
+        let destino = objetoModulo;
+
+        const partes = accion.split(".");
+
+        for (const parte of partes) {
+
+            destino = destino?.[parte];
+
+            if (!destino) {
+
+                console.warn(
+                    `[LISTENER] Acción no encontrada: ${modulo}.${accion}`
+                );
+
+                return;
+            }
+        }
+
+        if (typeof destino !== "function") {
+
+            console.warn(
+                `[LISTENER] No es una función: ${modulo}.${accion}`
             );
 
             return;
@@ -39,37 +62,30 @@
 
         try {
 
-            funcion(info);
+            destino(info);
 
         } catch (error) {
 
             console.error(
-                `Error ejecutando ${nombreFuncion}`,
+                `[LISTENER] Error ejecutando ${modulo}.${accion}`,
                 error
             );
 
         }
-
     }
 
-    /**
-     * Construye objeto estándar
-     */
-    function construirInfo(
-        evento,
-        elemento
-    ) {
-
-        const modulo =
-            elemento.dataset.modulo || "";
-
-        const accion =
-            elemento.dataset.accion || "";
+    // ==================================================
+    // CONSTRUIR INFO ESTÁNDAR
+    // ==================================================
+    function construirInfo(evento, elemento) {
 
         return {
 
-            modulo,
-            accion,
+            modulo:
+                elemento.dataset.modulo || "",
+
+            accion:
+                elemento.dataset.accion || "",
 
             evento,
 
@@ -85,100 +101,58 @@
                 elemento.value ?? null,
 
             texto:
-                elemento.textContent || "",
+                elemento.textContent?.trim() || "",
+
+            checked:
+                elemento.checked ?? false,
 
             dataset:
                 { ...elemento.dataset }
 
         };
-
     }
 
-    /**
-     * CLICK
-     */
+    // ==================================================
+    // MANEJADOR UNIVERSAL
+    // ==================================================
+    function manejarEvento(evento) {
+
+        const elemento =
+            evento.target.closest(
+                "[data-modulo][data-accion]"
+            );
+
+        if (!elemento) return;
+
+        const info =
+            construirInfo(
+                evento,
+                elemento
+            );
+
+        ejecutarFuncion(
+            info.modulo,
+            info.accion,
+            info
+        );
+    }
+
+    // ==================================================
+    // EVENTOS GLOBALES
+    // ==================================================
     document.addEventListener(
         "click",
-        (evento) => {
-
-            const elemento =
-                evento.target.closest(
-                    "[data-modulo][data-accion]"
-                );
-
-            if (!elemento) return;
-
-            const info =
-                construirInfo(
-                    evento,
-                    elemento
-                );
-
-            ejecutarFuncion(
-                info.modulo,
-                info.accion,
-                info
-            );
-
-        }
+        manejarEvento
     );
 
-    /**
-     * INPUT
-     */
     document.addEventListener(
         "input",
-        (evento) => {
-
-            const elemento =
-                evento.target.closest(
-                    "[data-modulo][data-accion]"
-                );
-
-            if (!elemento) return;
-
-            const info =
-                construirInfo(
-                    evento,
-                    elemento
-                );
-
-            ejecutarFuncion(
-                info.modulo,
-                info.accion,
-                info
-            );
-
-        }
+        manejarEvento
     );
 
-    /**
-     * CHANGE
-     */
     document.addEventListener(
         "change",
-        (evento) => {
-
-            const elemento =
-                evento.target.closest(
-                    "[data-modulo][data-accion]"
-                );
-
-            if (!elemento) return;
-
-            const info =
-                construirInfo(
-                    evento,
-                    elemento
-                );
-
-            ejecutarFuncion(
-                info.modulo,
-                info.accion,
-                info
-            );
-
-        }
+        manejarEvento
     );
 
 })();
