@@ -8,10 +8,7 @@
 // CONFIGURACIÓN GLOBAL
 // =====================================================
 const CONFIG = {
-
-  API_URL:
-    "https://script.google.com/macros/s/AKfycbx0WTI9ZLEC_ArJdkjYHplPSjXy3Xthc289eBaK894tC4ZREbrRaL_1IandKCaSYOZ85w/exec"
-
+  API_URL: "https://script.google.com/macros/s/AKfycbx0WTI9ZLEC_ArJdkjYHplPSjXy3Xthc289eBaK894tC4ZREbrRaL_1IandKCaSYOZ85w/exec"
 };
 
 // =====================================================
@@ -24,35 +21,27 @@ const Session = {
     if (!token) return;
 
     try {
-
       localStorage.setItem(
         "tokenFirmado",
         token
       );
-
     } catch (e) {
-
       console.warn(
         "localStorage no disponible:",
         e
       );
-
     }
 
     try {
-
       sessionStorage.setItem(
         "tokenFirmado",
         token
       );
-
     } catch (e) {
-
       console.warn(
         "sessionStorage no disponible:",
         e
       );
-
     }
 
     try {
@@ -65,7 +54,7 @@ const Session = {
       );
 
       document.cookie =
-        `tokenFirmado=${encodeURIComponent(token)}; expires=${d.toUTCString()}; path=/; SameSite=Lax; Secure`;
+        `tokenFirmado=${encodeURIComponent(token)};expires=${d.toUTCString()};path=/;SameSite=Lax;Secure`;
 
     } catch (e) {
 
@@ -133,19 +122,15 @@ const Session = {
   clear() {
 
     try {
-
       localStorage.removeItem(
         "tokenFirmado"
       );
-
     } catch (e) {}
 
     try {
-
       sessionStorage.removeItem(
         "tokenFirmado"
       );
-
     } catch (e) {}
 
     try {
@@ -197,12 +182,10 @@ function bootstrapToken() {
 // API FETCH
 // =====================================================
 async function apiFetch({
-
   modulo,
   accion,
   tokenFirmado,
   payload = {}
-
 }) {
 
   try {
@@ -224,27 +207,20 @@ async function apiFetch({
 
     const response =
       await fetch(
-
         CONFIG.API_URL,
-
         {
-
           method: "POST",
 
           headers: {
-
             "Content-Type":
               "text/plain;charset=utf-8"
-
           },
 
           body:
             JSON.stringify(
               body
             )
-
         }
-
       );
 
     const data =
@@ -260,13 +236,10 @@ async function apiFetch({
     );
 
     return {
-
       ok: false,
-
       error:
         error.message ||
         "Error de comunicación"
-
     };
 
   }
@@ -277,12 +250,10 @@ async function apiFetch({
 // CONTROLLER UNIVERSAL
 // =====================================================
 async function controller(
-
   modulo,
   accion,
   payload = {},
   tokenFirmado
-
 ) {
 
   try {
@@ -360,3 +331,9 @@ async function controller(
 // ARRANQUE
 // =====================================================
 bootstrapToken();
+
+// Exponer objetos globalmente
+window.CONFIG = CONFIG;
+window.Session = Session;
+window.apiFetch = apiFetch;
+window.controller = controller;
