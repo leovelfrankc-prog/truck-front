@@ -1,5 +1,25 @@
-API_URL:
-    "https://script.google.com/macros/s/...``` {
+/**
+ * ==========================================
+ * TRUCKERO - UTILES.JS
+ * ==========================================
+ */
+
+// =====================================================
+// CONFIGURACIÓN GLOBAL
+// =====================================================
+const CONFIG = {
+
+  API_URL:
+    "https://script.google.com/macros/s/AKfycbx0WTI9ZLEC_ArJdkjYHplPSjXy3Xthc289eBaK894tC4ZREbrRaL_1IandKCaSYOZ85w/exec"
+
+};
+
+// =====================================================
+// SESSION
+// =====================================================
+const Session = {
+
+  setToken(token) {
 
     if (!token) return;
 
@@ -158,17 +178,18 @@ function bootstrapToken() {
   const token =
     params.get("token");
 
-  if (token) {
+  if (!token) return;
 
-    Session.setToken(
-      token
-    );
+  Session.setToken(
+    token
+  );
 
-    console.log(
-      "[SESSION] Token almacenado"
-    );
+  window.TOKEN =
+    token;
 
-  }
+  console.log(
+    "[SESSION] Token almacenado"
+  );
 
 }
 
@@ -259,7 +280,7 @@ async function controller(
 
   modulo,
   accion,
-  payload,
+  payload = {},
   tokenFirmado
 
 ) {
@@ -270,8 +291,13 @@ async function controller(
       await apiFetch({
 
         modulo,
+
         accion,
-        tokenFirmado,
+
+        tokenFirmado:
+          tokenFirmado ||
+          Session.getToken(),
+
         payload
 
       });
@@ -302,7 +328,7 @@ async function controller(
     } else {
 
       console.warn(
-        `No existe ${modulo}.${accion}Retorno`
+        `[CONTROLLER] No existe ${modulo}.${accion}Retorno`
       );
 
     }
@@ -321,7 +347,8 @@ async function controller(
       ok: false,
 
       error:
-        error.message
+        error.message ||
+        "Error desconocido"
 
     };
 
