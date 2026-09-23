@@ -7,6 +7,13 @@ async function controller(
   const tokenFirmado =
     Session.getToken();
 
+  console.log("=====================================");
+  console.log("[CONTROLLER] INICIO");
+  console.log("[CONTROLLER] MODULO:", modulo);
+  console.log("[CONTROLLER] ACCION:", accion);
+  console.log("[CONTROLLER] TOKEN:", tokenFirmado);
+  console.log("[CONTROLLER] PAYLOAD:", payload);
+
   try {
 
     const respuesta =
@@ -19,18 +26,58 @@ async function controller(
 
       });
 
-    // ==========================================
-    // EJECUTAR SIEMPRE EL RETORNO
-    // ==========================================
+    console.log("=====================================");
+    console.log("[CONTROLLER] RESPUESTA BACKEND:");
+    console.log(respuesta);
+
+    console.log(
+      "[CONTROLLER] RESPUESTA JSON:"
+    );
+
+    console.log(
+      JSON.stringify(
+        respuesta,
+        null,
+        2
+      )
+    );
+
+    const nombreFuncion =
+      accion + "Retorno";
+
+    console.log(
+      "[CONTROLLER] NOMBRE FUNCION:",
+      nombreFuncion
+    );
+
+    console.log(
+      "[CONTROLLER] BUSCANDO:",
+      `window.${modulo}.${nombreFuncion}`
+    );
+
     const funcionRetorno =
       window[modulo]?.[
-        accion + "Retorno"
+        nombreFuncion
       ];
+
+    console.log(
+      "[CONTROLLER] MODULO ENCONTRADO:",
+      window[modulo]
+    );
+
+    console.log(
+      "[CONTROLLER] FUNCION ENCONTRADA:",
+      funcionRetorno
+    );
 
     if (
       typeof funcionRetorno ===
       "function"
     ) {
+
+      console.log(
+        "[CONTROLLER] EJECUTANDO RETORNO..."
+      );
 
       funcionRetorno(
         respuesta
@@ -39,7 +86,11 @@ async function controller(
     } else {
 
       console.warn(
-        `No existe ${modulo}.${accion}Retorno`
+        `[CONTROLLER] NO EXISTE ${modulo}.${nombreFuncion}`
+      );
+
+      alert(
+        `NO EXISTE ${modulo}.${nombreFuncion}`
       );
 
     }
@@ -49,19 +100,42 @@ async function controller(
   } catch (error) {
 
     console.error(
-      "[CONTROLLER]",
+      "[CONTROLLER] EXCEPCION:",
       error
+    );
+
+    console.log(
+      "[CONTROLLER] STACK:"
+    );
+
+    console.log(
+      error?.stack
+    );
+
+    const nombreFuncion =
+      accion + "Retorno";
+
+    console.log(
+      "[CONTROLLER] INTENTANDO RETORNO ERROR:"
+    );
+
+    console.log(
+      `window.${modulo}.${nombreFuncion}`
     );
 
     const funcionRetorno =
       window[modulo]?.[
-        accion + "Retorno"
+        nombreFuncion
       ];
 
     if (
       typeof funcionRetorno ===
       "function"
     ) {
+
+      console.log(
+        "[CONTROLLER] EJECUTANDO RETORNO DE ERROR..."
+      );
 
       funcionRetorno({
 
@@ -71,7 +145,10 @@ async function controller(
           "Error de comunicación",
 
         error:
-          error.message
+          error.message,
+
+        stack:
+          error.stack
 
       });
 
@@ -85,7 +162,10 @@ async function controller(
         "Error de comunicación",
 
       error:
-        error.message
+        error.message,
+
+      stack:
+        error.stack
 
     };
 
