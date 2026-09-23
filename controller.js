@@ -5,9 +5,9 @@ async function controller(
   modulo,
   accion,
   payload,
-  tokenFirmado
+  
 ) {
-
+const tokenFirmado=Session.getToken();
   try {
 
     const respuesta =
