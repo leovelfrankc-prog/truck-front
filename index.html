@@ -63,7 +63,7 @@
                 document.getElementById('vistas').innerHTML = `<pre style='padding:15px;font-size:12px;white-space:pre-wrap;'>URL:\n${location.href}\n\nTOKEN URL:\n${tokenUrl}\n\nTOKEN STORAGE:\n${tokenStorage}\n\nTOKEN FINAL:\n${tokenFirmado}</pre>`;
 
                 // 6. Ejecutar router pasando el token válido
-                await router('login', tokenFirmado);
+                await router('inicio', tokenFirmado);
 
             } catch (error) {
                 mostrarError('ERROR INICIANDO TRUCKERO', error?.stack || error?.message || String(error));
