@@ -19,7 +19,7 @@
 
     <script>
         // Declaración global de la variable TOKEN
-        let TOKEN = null;
+        window.TOKEN = null;
 
         function mostrarError(titulo, contenido) {
             const vistas = document.getElementById('vistas');
@@ -52,7 +52,7 @@
                 }
 
                 // 3. Capturar/Actualizar la variable global TOKEN desde Session
-                TOKEN = Session.getToken();
+                window.TOKEN = Session.getToken();
 
                 // 4. Registrar Service Worker en segundo plano (SIN bloquear el flujo principal)
                 if ('serviceWorker' in navigator) {
@@ -65,7 +65,7 @@
                 document.getElementById('vistas').innerHTML = `<pre style='padding:15px;font-size:12px;white-space:pre-wrap;'>URL:\n${location.href}\n\nTOKEN URL:\n${tokenUrl}\n\nTOKEN GLOBAL (DOM):\n${TOKEN}</pre>`;
 
                 // 6. Ejecutar router pasando la variable TOKEN
-                await router('inicio', TOKEN);
+                await router('inicio');
 
             } catch (error) {
                 mostrarError('ERROR INICIANDO TRUCKERO', error?.stack || error?.message || String(error));
