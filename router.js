@@ -3,7 +3,7 @@ async function router(modulo) {
   
 
   console.group(`[ROUTER] Cargando módulo: "${modulo}"`);
-  console.log("--> 1. Parámetros de entrada:", { modulo, token });
+  
 
   try {
     console.log("--> 2. Solicitando datos a apiFetch...");
