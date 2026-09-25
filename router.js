@@ -1,13 +1,16 @@
-async function router(modulo, tokenFirmado) {
+async function router(modulo) {
+  // Capturamos la variable global TOKEN definida en index.html
+  const token = typeof TOKEN !== "undefined" ? TOKEN : Session.getToken();
+
   console.group(`[ROUTER] Cargando módulo: "${modulo}"`);
-  console.log("--> 1. Parámetros de entrada:", { modulo, tokenFirmado });
+  console.log("--> 1. Parámetros de entrada:", { modulo, token });
 
   try {
     console.log("--> 2. Solicitando datos a apiFetch...");
     const respuesta = await apiFetch({
       modulo,
       accion: "cargarVista",
-      tokenFirmado,
+      token,
       payload: {}
     });
 
@@ -15,7 +18,6 @@ async function router(modulo, tokenFirmado) {
 
     if (!respuesta) {
       console.error("❌ ERROR: apiFetch no devolvió nada (undefined/null)");
-      console.groupEnd();
       return;
     }
 
