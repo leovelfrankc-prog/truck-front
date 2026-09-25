@@ -1,20 +1,15 @@
 async function router(modulo) {
-  // Capturamos la variable global TOKEN definida en index.html
-  
-
   console.group(`[ROUTER] Cargando módulo: "${modulo}"`);
-  
 
   try {
-    console.log("--> 2. Solicitando datos a apiFetch...");
+    console.log("--> 1. Solicitando datos a apiFetch...");
     const respuesta = await apiFetch({
       modulo,
       accion: "cargarVista",
-      
       payload: {}
     });
 
-    console.log("--> 3. Respuesta de apiFetch recibida:", respuesta);
+    console.log("--> 2. Respuesta de apiFetch recibida:", respuesta);
 
     if (!respuesta) {
       console.error("❌ ERROR: apiFetch no devolvió nada (undefined/null)");
@@ -22,17 +17,17 @@ async function router(modulo) {
     }
 
     if (!respuesta.ok) {
-  alert(JSON.stringify(respuesta, null, 2)); // Corregido: stringify
-  console.error("❌ ERROR: la respuesta devolvió ok: false", respuesta.error);
-  throw new Error(respuesta.error || "Error al cargar la vista");
-}
+      alert(JSON.stringify(respuesta, null, 2));
+      console.error("❌ ERROR: la respuesta devolvió ok: false", respuesta.error);
+      throw new Error(respuesta.error || "Error al cargar la vista");
+    }
 
     // 1. Insertar HTML
     const contenedor = document.getElementById("vistas");
-    console.log("--> 4. Buscando contenedor #vistas:", contenedor);
+    console.log("--> 3. Buscando contenedor #vistas:", contenedor);
 
     if (contenedor) {
-      console.log("--> 4a. Longitud de respuesta.html:", respuesta.html?.length || 0);
+      console.log("--> 3a. Longitud de respuesta.html:", respuesta.html?.length || 0);
       contenedor.innerHTML = respuesta.html || "";
       console.log("✅ HTML insertado correctamente.");
     } else {
@@ -41,7 +36,7 @@ async function router(modulo) {
 
     // 2. Insertar JS
     if (respuesta.js) {
-      console.log("--> 5. Insertando script JS (longitud:", respuesta.js.length, "caracteres)...");
+      console.log("--> 4. Insertando script JS (longitud:", respuesta.js.length, "caracteres)...");
       const script = document.createElement("script");
       script.type = "text/javascript";
       script.textContent = respuesta.js;
@@ -53,7 +48,7 @@ async function router(modulo) {
 
     // 3. Ejecutar init[Modulo]() únicamente si existe
     const nombreFuncion = "init" + modulo.charAt(0).toUpperCase() + modulo.slice(1);
-    console.log(`--> 6. Buscando función de inicialización: window["${nombreFuncion}"]`);
+    console.log(`--> 5. Buscando función de inicialización: window["${nombreFuncion}"]`);
 
     const initFuncion = window[nombreFuncion];
 
