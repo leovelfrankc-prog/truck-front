@@ -22,9 +22,10 @@ async function router(modulo) {
     }
 
     if (!respuesta.ok) {
-      console.error("❌ ERROR: la respuesta devolvió ok: false", respuesta.error);
-      throw new Error(respuesta.error || "Error al cargar la vista");
-    }
+  alert(JSON.stringify(respuesta, null, 2)); // Corregido: stringify
+  console.error("❌ ERROR: la respuesta devolvió ok: false", respuesta.error);
+  throw new Error(respuesta.error || "Error al cargar la vista");
+}
 
     // 1. Insertar HTML
     const contenedor = document.getElementById("vistas");
