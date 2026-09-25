@@ -1,6 +1,6 @@
 async function router(modulo) {
   // Capturamos la variable global TOKEN definida en index.html
-  const token = window.TOKEN;
+  
 
   console.group(`[ROUTER] Cargando módulo: "${modulo}"`);
   console.log("--> 1. Parámetros de entrada:", { modulo, token });
@@ -10,7 +10,7 @@ async function router(modulo) {
     const respuesta = await apiFetch({
       modulo,
       accion: "cargarVista",
-      token,
+      
       payload: {}
     });
 
