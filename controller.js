@@ -10,7 +10,7 @@ async function controller(
   console.log("[CONTROLLER] INICIO");
   console.log("[CONTROLLER] MODULO:", modulo);
   console.log("[CONTROLLER] ACCION:", accion);
-  console.log("[CONTROLLER] TOKEN:", tokenFirmado);
+  
   console.log("[CONTROLLER] PAYLOAD:", payload);
 
   try {
