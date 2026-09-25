@@ -184,10 +184,9 @@ function bootstrapToken() {
 async function apiFetch({
   modulo,
   accion,
-  tokenFirmado,
   payload = {}
 }) {
-
+const token = window.TOKEN
   try {
 
     const body = {
@@ -199,7 +198,7 @@ async function apiFetch({
 
       accion,
 
-      tokenFirmado,
+      tokenFirmado:token,
 
       payload
 
