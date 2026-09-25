@@ -4,8 +4,7 @@ async function controller(
   payload
 ) {
 
-  const tokenFirmado =
-    Session.getToken();
+  const token = typeof TOKEN !== "undefined" ? TOKEN : Session.getToken();
 
   console.log("=====================================");
   console.log("[CONTROLLER] INICIO");
