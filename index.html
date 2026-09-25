@@ -18,6 +18,9 @@
     <script src="listeners.js"></script>
 
     <script>
+        // Declaración global de la variable TOKEN
+        let TOKEN = null;
+
         function mostrarError(titulo, contenido) {
             const vistas = document.getElementById('vistas');
             vistas.innerHTML = `<div style='padding:20px;font-family:monospace;color:#b91c1c;white-space:pre-wrap;word-break:break-word;'>${titulo}\n\n${contenido}</div>`;
@@ -38,7 +41,7 @@
                 const params = new URLSearchParams(window.location.search);
                 const tokenUrl = params.get('token');
 
-                // 2. Si viene un token en la URL, guardarlo inmediatamente
+                // 2. Si viene un token en la URL, guardarlo inmediatamente en Session
                 if (tokenUrl) {
                     Session.setToken(tokenUrl);
                     console.log('Token guardado desde URL');
@@ -48,22 +51,21 @@
                     window.history.replaceState({}, document.title, cleanUrl);
                 }
 
-                // 3. Registrar Service Worker en segundo plano (SIN bloquear el flujo principal con await)
+                // 3. Capturar/Actualizar la variable global TOKEN desde Session
+                TOKEN = Session.getToken();
+
+                // 4. Registrar Service Worker en segundo plano (SIN bloquear el flujo principal)
                 if ('serviceWorker' in navigator) {
                     navigator.serviceWorker.register('./sw.js')
                         .then(() => console.log('Service Worker registrado'))
                         .catch(err => console.warn('Error al registrar Service Worker:', err));
                 }
 
-                // 4. Fallback de recuperación: Usar la variable en memoria si localStorage devuelve null en iOS
-                const tokenStorage = Session.getToken();
-                const tokenFirmado = tokenUrl || tokenStorage;
-
                 // 5. Panel de depuración visual para verificar estado en móvil
-                document.getElementById('vistas').innerHTML = `<pre style='padding:15px;font-size:12px;white-space:pre-wrap;'>URL:\n${location.href}\n\nTOKEN URL:\n${tokenUrl}\n\nTOKEN STORAGE:\n${tokenStorage}\n\nTOKEN FINAL:\n${tokenFirmado}</pre>`;
+                document.getElementById('vistas').innerHTML = `<pre style='padding:15px;font-size:12px;white-space:pre-wrap;'>URL:\n${location.href}\n\nTOKEN URL:\n${tokenUrl}\n\nTOKEN GLOBAL (DOM):\n${TOKEN}</pre>`;
 
-                // 6. Ejecutar router pasando el token válido
-                await router('inicio', tokenFirmado);
+                // 6. Ejecutar router pasando la variable TOKEN
+                await router('inicio', TOKEN);
 
             } catch (error) {
                 mostrarError('ERROR INICIANDO TRUCKERO', error?.stack || error?.message || String(error));
