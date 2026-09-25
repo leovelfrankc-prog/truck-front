@@ -4,7 +4,7 @@ async function controller(
   payload
 ) {
 
-  const token = window.TOKEN;
+  
 
   console.log("=====================================");
   console.log("[CONTROLLER] INICIO");
@@ -20,7 +20,7 @@ async function controller(
 
         modulo,
         accion,
-        tokenFirmado,
+        
         payload
 
       });
