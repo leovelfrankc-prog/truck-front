@@ -4,7 +4,7 @@ async function controller(
   payload
 ) {
 
-  const token = typeof TOKEN !== "undefined" ? TOKEN : Session.getToken();
+  const token = window.TOKEN;
 
   console.log("=====================================");
   console.log("[CONTROLLER] INICIO");
