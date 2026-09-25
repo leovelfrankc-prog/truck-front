@@ -186,65 +186,52 @@ async function apiFetch({
   accion,
   payload = {}
 }) {
-const token = window.TOKEN
+  // 1. Diagnóstico de captura de token
+  const token = window.TOKEN;
+
+  console.group(`[APIFETCH] Petición -> Módulo: "${modulo}" | Acción: "${accion}"`);
+  console.log("--> 1. Estado de window.TOKEN al ejecutar apiFetch:", {
+    tokenCapturado: token,
+    tipoDato: typeof token,
+    longitud: token ? token.length : 0
+  });
+
   try {
-
     const body = {
-
-      requestId:
-        crypto.randomUUID(),
-
+      requestId: crypto.randomUUID(),
       modulo,
-
       accion,
-
-      tokenFirmado:token,
-
+      tokenFirmado: token,
       payload
-
     };
 
-    const response =
-      await fetch(
-        CONFIG.API_URL,
-        {
-          method: "POST",
+    // 2. Diagnóstico del JSON final que sale por el red HTTP
+    console.log("--> 2. Body que se enviará en el POST a Apps Script:", body);
 
-          headers: {
-            "Content-Type":
-              "text/plain;charset=utf-8"
-          },
+    const response = await fetch(CONFIG.API_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "text/plain;charset=utf-8"
+      },
+      body: JSON.stringify(body)
+    });
 
-          body:
-            JSON.stringify(
-              body
-            )
-        }
-      );
-
-    const data =
-      await response.json();
+    const data = await response.json();
+    console.log("--> 3. Respuesta cruda del Servidor:", data);
 
     return data;
 
   } catch (error) {
-
-    console.error(
-      "[APIFETCH]",
-      error
-    );
+    console.error("❌ [APIFETCH] Error en la petición HTTP:", error);
 
     return {
       ok: false,
-      error:
-        error.message ||
-        "Error de comunicación"
+      error: error.message || "Error de comunicación"
     };
-
+  } finally {
+    console.groupEnd();
   }
-
 }
-
 // =====================================================
 // ARRANQUE
 // =====================================================
