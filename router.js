@@ -1,6 +1,6 @@
 async function router(modulo) {
   // Capturamos la variable global TOKEN definida en index.html
-  const token = typeof TOKEN !== "undefined" ? TOKEN : Session.getToken();
+  const token = window.TOKEN;
 
   console.group(`[ROUTER] Cargando módulo: "${modulo}"`);
   console.log("--> 1. Parámetros de entrada:", { modulo, token });
