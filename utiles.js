@@ -241,4 +241,4 @@ bootstrapToken();
 window.CONFIG = CONFIG;
 window.Session = Session;
 window.apiFetch = apiFetch;
-window.controller = controller;
+
