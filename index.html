@@ -82,13 +82,13 @@
 
                 // 5. Panel de depuración visual para verificar estado en móvil
                 document.getElementById('vistas').innerHTML = `<pre style='padding:15px;font-size:12px;white-space:pre-wrap;'>URL:\n${location.href}\n\nTOKEN URL:\n${tokenUrl}\n\nTOKEN GLOBAL (DOM):\n${TOKEN}</pre>`;
-router("login")
+
                 // 6. Ejecutar router pasando la variable TOKEN
              //    await controller(
-      //"inicio",
-    //  "cargarVista",
+      "inicio",
+      "cargarVista",
       
-  //  );
+  );
 
             } catch (error) {
                 mostrarError('ERROR INICIANDO TRUCKERO', error?.stack || error?.message || String(error));
