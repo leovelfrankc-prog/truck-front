@@ -243,6 +243,27 @@ window.inicio = {
   }
 
 };
+function cargarMenuRolesSecundarios(roles) {
+
+    const menu = document.getElementById("menuRolesSecundarios");
+
+    menu.innerHTML = "";
+
+    roles.forEach(rol => {
+
+        const boton = document.createElement("button");
+
+        boton.textContent = rol.nombre;
+
+        boton.onclick = () => {
+            router(rol.modulo);
+        };
+
+        menu.appendChild(boton);
+
+    });
+
+}
 // =====================================================
 // ARRANQUE
 // =====================================================
@@ -252,4 +273,5 @@ bootstrapToken();
 window.CONFIG = CONFIG;
 window.Session = Session;
 window.apiFetch = apiFetch;
+window.cargarMenuRolesSecundarios = cargarMenuRolesSecundarios;
 
