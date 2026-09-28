@@ -236,7 +236,7 @@ async function apiFetch({
 //INICIORETORNO
 //====================================================
 window.inicio{
-  cargarVistaRetorno(res) {
+  CargarVistaRetorno(res) {
   alert(JSON.stringify(res, null, 2));
 }
  
