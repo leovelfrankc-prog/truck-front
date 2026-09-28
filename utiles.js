@@ -235,11 +235,13 @@ async function apiFetch({
 //====================================================
 //INICIORETORNO
 //====================================================
-window.inicio{
+window.inicio = {
+
+  // La 'C' debe ser Mayúscula para coincidir con la acción "CargarVista" + "Retorno"
   CargarVistaRetorno(res) {
-  alert(JSON.stringify(res, null, 2));
-}
- 
+    alert(JSON.stringify(res, null, 2));
+  }
+
 };
 // =====================================================
 // ARRANQUE
