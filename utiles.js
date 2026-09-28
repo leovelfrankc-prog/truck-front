@@ -235,9 +235,12 @@ async function apiFetch({
 //====================================================
 //INICIORETORNO
 //====================================================
-function inicioRetorno(res) {
+window.inicio{
+  cargarVistaRetorno(res) {
   alert(JSON.stringify(res, null, 2));
 }
+ 
+};
 // =====================================================
 // ARRANQUE
 // =====================================================
