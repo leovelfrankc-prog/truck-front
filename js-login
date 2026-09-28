@@ -1,0 +1,117 @@
+// ============================================================
+// OBJETO LOGIN
+// ============================================================
+window.login = {
+
+  // ==========================================================
+  // ENVIAR LOGIN
+  // ==========================================================
+  async enviar() {
+
+    const form =
+      document.getElementById(
+        "form-login"
+      );
+
+    if (!form) {
+
+      alert(
+        "Error: formulario no encontrado."
+      );
+
+      return;
+    }
+
+    const formData =
+      new FormData(form);
+
+    const usuario =
+      formData.get(
+        "usuario"
+      );
+
+    const password =
+      formData.get(
+        "password"
+      );
+
+    const payload = {
+      usuario,
+      password
+    };
+   const mensaje = {
+  usuario,
+  password,
+  token: window.TOKEN
+};
+
+alert(
+  JSON.stringify(
+    mensaje,
+    null,
+    2
+  )
+);
+    await controller(
+      "login",
+      "validar",
+      payload
+    );
+
+  },
+
+  // ==========================================================
+  // RETORNO VALIDACIÓN
+  // ==========================================================
+  validarRetorno(res) {
+   alert(JSON.stringify(res));
+    console.log(
+      "====================================="
+    );
+
+    console.log(
+      "[LOGIN] validarRetorno()"
+    );
+
+    console.log(
+      "[LOGIN] respuesta:",
+      res
+    );
+
+    if (
+      !res ||
+      typeof res !== "object"
+    ) {
+
+      alert(
+        "Error inesperado en la respuesta del servidor."
+      );
+
+      return;
+    }
+
+    if (!res.ok) {
+
+      alert(
+        JSON.stringify(res)
+      );
+
+      return;
+    }
+
+    const payload =
+      res.payload;
+
+    console.log(
+      "[LOGIN] payload:",
+      payload
+    );
+
+    alert(
+      res.mensaje ||
+      "Inicio de sesión exitoso"
+    );
+
+  }
+
+};
