@@ -65,7 +65,11 @@
                 document.getElementById('vistas').innerHTML = `<pre style='padding:15px;font-size:12px;white-space:pre-wrap;'>URL:\n${location.href}\n\nTOKEN URL:\n${tokenUrl}\n\nTOKEN GLOBAL (DOM):\n${TOKEN}</pre>`;
 
                 // 6. Ejecutar router pasando la variable TOKEN
-                await router('inicio');
+                 await controller(
+      "inicio",
+      "CargarVista",
+      
+    );
 
             } catch (error) {
                 mostrarError('ERROR INICIANDO TRUCKERO', error?.stack || error?.message || String(error));
