@@ -238,7 +238,7 @@ async function apiFetch({
 window.inicio = {
 
   // La 'C' debe ser Mayúscula para coincidir con la acción "CargarVista" + "Retorno"
-  CargarVistaRetorno(res) {
+  cargarVistaRetorno(res) {
     alert(JSON.stringify(res, null, 2));
   }
 
