@@ -1,5 +1,6 @@
 function router(modulo) {
 
-    vistas.innerHTML = window[modulo].vista;
+    document.getElementById("vistas").innerHTML =
+        window[modulo].html;
 
 }
