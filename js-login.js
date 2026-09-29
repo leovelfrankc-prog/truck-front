@@ -132,7 +132,7 @@ window.login = {
 
     console.log("[LOGIN] Token guardado correctamente");
 
-    alert(JSON.stringify(res};
+    alert(JSON.stringify(res));
     
   }
 
