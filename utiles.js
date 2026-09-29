@@ -240,7 +240,7 @@ window.inicio = {
   // La 'C' debe ser Mayúscula para coincidir con la acción "CargarVista" + "Retorno"
   cargarVistaRetorno(res) {
     alert(JSON.stringify(res, null, 2));
-    alert(res.data.vista);
+    router(res.data.vista);
   }
 
 };
