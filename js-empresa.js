@@ -148,7 +148,7 @@ window.empresa = {
       }
 
       // Redirigir a login
-      await router("login", token);
+      await router("login");
 
     } catch (error) {
       console.error("[empresa] Error en registrarRetorno:", error);
