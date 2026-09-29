@@ -9,7 +9,6 @@
     <link rel="stylesheet" href="estilos.css">
 </head>
 <body>
-    <body>
 
     <!-- HEADER -->
     <header id="headerApp">
@@ -28,72 +27,88 @@
         Truckero
     </footer>
 
-</body>
+    <!-- Scripts -->
     <script src="utiles.js"></script>
     <script src="router.js"></script>
     <script src="controller.js"></script>
     <script src="listeners.js"></script>
     <script src="js-login.js"></script>
-  
 
     <script>
-        // Declaración global de la variable TOKEN
+        // Variable global del token
         window.TOKEN = null;
 
         function mostrarError(titulo, contenido) {
             const vistas = document.getElementById('vistas');
-            vistas.innerHTML = `<div style='padding:20px;font-family:monospace;color:#b91c1c;white-space:pre-wrap;word-break:break-word;'>${titulo}\n\n${contenido}</div>`;
+            vistas.innerHTML = `
+                <div style="padding:20px;font-family:monospace;color:#b91c1c;white-space:pre-wrap;word-break:break-word;">
+                    ${titulo}
+
+${contenido}
+                </div>`;
         }
 
+        // Captura de errores globales
         window.onerror = function(mensaje, archivo, linea, columna, error) {
-            mostrarError('ERROR JAVASCRIPT', `Mensaje: ${mensaje}\n\nArchivo: ${archivo}\n\nLínea: ${linea}\n\nColumna: ${columna}\n\nStack:\n${error?.stack || 'No disponible'}`);
+            mostrarError('ERROR JAVASCRIPT', 
+                `Mensaje: ${mensaje}\n\nArchivo: ${archivo}\n\nLínea: ${linea}\n\nColumna: ${columna}\n\nStack:\n${error?.stack || 'No disponible'}`);
             return true;
         };
 
         window.addEventListener('unhandledrejection', event => {
-            mostrarError('ERROR PROMESA', event.reason?.stack || JSON.stringify(event.reason, null, 2) || String(event.reason));
+            mostrarError('ERROR PROMESA', 
+                event.reason?.stack || JSON.stringify(event.reason, null, 2) || String(event.reason));
         });
 
         document.addEventListener('DOMContentLoaded', async () => {
             try {
-                // 1. Capturar el token desde la URL de forma síncrona
+                // 1. Capturar token de la URL
                 const params = new URLSearchParams(window.location.search);
                 const tokenUrl = params.get('token');
 
-                // 2. Si viene un token en la URL, guardarlo inmediatamente en Session
+                // 2. Si existe token en URL → guardarlo y limpiar la barra de direcciones
                 if (tokenUrl) {
                     Session.setToken(tokenUrl);
                     console.log('Token guardado desde URL');
 
-                    // Limpiar la URL de la barra de direcciones para evitar fallos de PWA en iOS y Android
                     const cleanUrl = window.location.origin + window.location.pathname;
                     window.history.replaceState({}, document.title, cleanUrl);
                 }
 
-                // 3. Capturar/Actualizar la variable global TOKEN desde Session
+                // 3. Actualizar variable global
                 window.TOKEN = Session.getToken();
 
-                // 4. Registrar Service Worker en segundo plano (SIN bloquear el flujo principal)
+                // 4. Registrar Service Worker (no bloqueante)
                 if ('serviceWorker' in navigator) {
                     navigator.serviceWorker.register('./sw.js')
                         .then(() => console.log('Service Worker registrado'))
                         .catch(err => console.warn('Error al registrar Service Worker:', err));
                 }
 
-                // 5. Panel de depuración visual para verificar estado en móvil
-                document.getElementById('vistas').innerHTML = `<pre style='padding:15px;font-size:12px;white-space:pre-wrap;'>URL:\n${location.href}\n\nTOKEN URL:\n${tokenUrl}\n\nTOKEN GLOBAL (DOM):\n${TOKEN}</pre>`;
+                // 5. (Opcional) Panel de depuración — descomenta solo si lo necesitas
+                /*
+                document.getElementById('vistas').innerHTML = `
+                    <pre style="padding:15px;font-size:12px;white-space:pre-wrap;">
+URL:
+${location.href}
 
-                // 6. Ejecutar router pasando la variable TOKEN
-             //    await controller(
-      "inicio",
-      "cargarVista",
-      
-  );
+TOKEN URL:
+${tokenUrl}
+
+TOKEN GLOBAL:
+${window.TOKEN}
+                    </pre>`;
+                */
+
+                // 6. Iniciar la aplicación
+                await controller("inicio", "cargarVista");
 
             } catch (error) {
-                mostrarError('ERROR INICIANDO TRUCKERO', error?.stack || error?.message || String(error));
+                mostrarError('ERROR INICIANDO TRUCKERO', 
+                    error?.stack || error?.message || String(error));
             }
         });
     </script>
+
 </body>
 </html>
