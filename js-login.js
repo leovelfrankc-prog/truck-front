@@ -127,14 +127,13 @@ window.login = {
     }
 
     // Guardar sesión
-    Session.clear();
-    Session.setToken(token);
-    window.TOKEN = Session.getToken();
+    
+    window.TOKEN = token;
 
     console.log("[LOGIN] Token guardado correctamente");
 
-    // Redirigir a la vista principal (ajusta el nombre según tu app)
-    await router("inicio");   // o "dashboard", "home", etc.
+    alert(JSON.stringify(res};
+    
   }
 
 };
