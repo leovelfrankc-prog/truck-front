@@ -280,19 +280,31 @@ function cargarMenuRolesSecundarios(roles) {
     ? roles.secundarios
     : [];
 
-  // Si hay al menos un rol secundario → construir botones
+  // Solo crear botones si hay al menos un rol secundario
   if (rolesSecundarios.length > 0) {
+
+    // Botón del rol principal
+    if (typeof rolPrincipal === "string" && rolPrincipal.trim()) {
+      const botonPrincipal = document.createElement("button");
+      botonPrincipal.textContent = rolPrincipal;
+      botonPrincipal.onclick = () => router(rolPrincipal);
+      menu.appendChild(botonPrincipal);
+    }
+
+    // Botones de los roles secundarios
     rolesSecundarios.forEach(rol => {
       if (typeof rol !== "string" || !rol.trim()) return;
+      if (rol === rolPrincipal) return; // evitar duplicado
 
       const boton = document.createElement("button");
       boton.textContent = rol;
       boton.onclick = () => router(rol);
       menu.appendChild(boton);
     });
-  } 
-  // Si no hay roles secundarios → ir directo al rol principal
-  else if (rolPrincipal) {
+  }
+
+  // SIEMPRE mostrar por defecto la vista del rol principal
+  if (rolPrincipal) {
     router(rolPrincipal);
   }
 }
