@@ -133,7 +133,7 @@ window.login = {
     console.log("[LOGIN] Token guardado correctamente");
 
     alert(JSON.stringify(res));
-    cargarMenuRolesSecundarios(res.roles);
+    cargarMenuRolesSecundarios(res.payload.roles);
   }
 
 };
