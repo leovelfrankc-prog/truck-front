@@ -103,37 +103,38 @@ window.login = {
   // ==========================================================
   // RETORNO VALIDACIÓN
   // ==========================================================
-  async validarRetorno(res) {
-    console.log("[LOGIN] validarRetorno()", res);
+async validarRetorno(res) {
+  console.log("[LOGIN] validarRetorno()", res);
 
-    if (!res || typeof res !== "object") {
-      alert("Error inesperado en la respuesta del servidor.");
-      return;
-    }
-
-    // Error del servidor
-    if (!res.ok) {
-      alert(res.mensaje || res.error || "Credenciales incorrectas");
-      return;
-    }
-
-    // Éxito
-    const token = res?.payload?.token || res?.data?.token || res?.token;
-
-    if (!token) {
-      alert("El servidor no devolvió un token válido.");
-      console.warn("[LOGIN] Respuesta sin token:", res);
-      return;
-    }
-
-    // Guardar sesión
-    
-    window.TOKEN = token;
-
-    console.log("[LOGIN] Token guardado correctamente");
-
-    alert(JSON.stringify(res));
-    cargarMenuRolesSecundarios(res.payload.roles);
+  if (!res || typeof res !== "object") {
+    alert("Error inesperado en la respuesta del servidor.");
+    return;
   }
 
+  if (!res.ok) {
+    alert(res.mensaje || res.error || "Credenciales incorrectas");
+    return;
+  }
+
+  const token = res?.payload?.token || res?.data?.token || res?.token;
+  const roles = res?.payload?.roles || res?.data?.roles || res?.roles;
+
+  if (!token) {
+    alert("El servidor no devolvió un token válido.");
+    console.warn("[LOGIN] Respuesta sin token:", res);
+    return;
+  }
+
+  // Guardar sesión
+  Session.setToken(token);
+  window.TOKEN = token;
+  console.log("[LOGIN] Token guardado correctamente");
+
+  // Menú de roles o redirección
+  if (roles) {
+    cargarMenuRolesSecundarios(roles);
+  } else {
+    router("admin"); // fallback
+  }
+}
 };
