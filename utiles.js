@@ -245,25 +245,31 @@ window.inicio = {
 
 };
 function cargarMenuRolesSecundarios(roles) {
+  const menu = document.getElementById("menuRolesSecundarios");
+  if (!menu) return;
 
-    const menu = document.getElementById("menuRolesSecundarios");
+  menu.innerHTML = "";
 
-    menu.innerHTML = "";
+  const rolPrincipal = roles?.principal;
+  const rolesSecundarios = Array.isArray(roles?.secundarios)
+    ? roles.secundarios
+    : [];
 
-    roles.forEach(rol => {
+  // Si hay al menos un rol secundario → construir botones
+  if (rolesSecundarios.length > 0) {
+    rolesSecundarios.forEach(rol => {
+      if (typeof rol !== "string" || !rol.trim()) return;
 
-        const boton = document.createElement("button");
-
-        boton.textContent = rol.nombre;
-
-        boton.onclick = () => {
-            router(rol.modulo);
-        };
-
-        menu.appendChild(boton);
-
+      const boton = document.createElement("button");
+      boton.textContent = rol;
+      boton.onclick = () => router(rol);
+      menu.appendChild(boton);
     });
-
+  } 
+  // Si no hay roles secundarios → ir directo al rol principal
+  else if (rolPrincipal) {
+    router(rolPrincipal);
+  }
 }
 // =====================================================
 // ARRANQUE
