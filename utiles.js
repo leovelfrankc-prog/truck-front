@@ -237,10 +237,35 @@ async function apiFetch({
 //====================================================
 window.inicio = {
 
-  // La 'C' debe ser Mayúscula para coincidir con la acción "CargarVista" + "Retorno"
   cargarVistaRetorno(res) {
-    alert(JSON.stringify(res, null, 2));
-    //router(res.data.vista);
+    console.log("[inicio] cargarVistaRetorno()", res);
+
+    // Si falló la comunicación con el backend
+    if (!res || res.ok === false) {
+      console.error("[inicio] Error del backend:", res?.error || res);
+      alert("No se pudo conectar con el servidor:\n" + (res?.error || "Error desconocido"));
+      router("login"); // fallback
+      return;
+    }
+
+    const vista =
+      res?.data?.vista ||
+      res?.vista ||
+      res?.payload?.vista ||
+      res?.roles?.principal ||
+      null;
+
+    if (res?.roles) {
+      cargarMenuRolesSecundarios(res.roles);
+      return;
+    }
+
+    if (vista) {
+      router(vista);
+      return;
+    }
+
+    router("login");
   }
 
 };
