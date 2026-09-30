@@ -37,6 +37,7 @@ window.chofer = {
     </div>
   `
 
-console.log("[CHOFER] módulo chofer cargado");
+
 
 };
+console.log("[CHOFER] módulo chofer cargado");
