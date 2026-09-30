@@ -8,8 +8,20 @@
 // CONFIGURACIÓN GLOBAL
 // =====================================================
 const CONFIG = {
-  API_URL: "https://script.google.com/macros/s/AKfycbx0WTI9ZLEC_ArJdkjYHplPSjXy3Xthc289eBaK894tC4ZREbrRaL_1IandKCaSYOZ85w/exec"
+  API_URL: "https://script.google.com/macros/s/AKfycbx0WTI9ZLEC_ArJdkjYHplPSjXy3Xthc289eBaK894tC4ZREbrRaL_1IandKCaSYOZ85w/exec",
+  DEBUG: true // ponlo en false en producción para silenciar logs
 };
+
+// =====================================================
+// HELPERS DE LOG
+// =====================================================
+function log(...args) {
+  if (CONFIG.DEBUG) console.log(...args);
+}
+
+function logError(...args) {
+  console.error(...args);
+}
 
 // =====================================================
 // SESSION
@@ -17,184 +29,72 @@ const CONFIG = {
 const Session = {
 
   setToken(token) {
-
     if (!token) return;
 
-    try {
-      localStorage.setItem(
-        "tokenFirmado",
-        token
-      );
-    } catch (e) {
-      console.warn(
-        "localStorage no disponible:",
-        e
-      );
-    }
+    try { localStorage.setItem("tokenFirmado", token); } catch (e) {}
+    try { sessionStorage.setItem("tokenFirmado", token); } catch (e) {}
 
     try {
-      sessionStorage.setItem(
-        "tokenFirmado",
-        token
-      );
-    } catch (e) {
-      console.warn(
-        "sessionStorage no disponible:",
-        e
-      );
-    }
-
-    try {
-
       const d = new Date();
-
-      d.setTime(
-        d.getTime() +
-        (30 * 24 * 60 * 60 * 1000)
-      );
-
+      d.setTime(d.getTime() + 30 * 24 * 60 * 60 * 1000);
       document.cookie =
         `tokenFirmado=${encodeURIComponent(token)};expires=${d.toUTCString()};path=/;SameSite=Lax;Secure`;
-
-    } catch (e) {
-
-      console.warn(
-        "Cookie no disponible:",
-        e
-      );
-
-    }
-
+    } catch (e) {}
   },
 
   getToken() {
-
-    let token = null;
-
     try {
-
-      token =
-        localStorage.getItem(
-          "tokenFirmado"
-        );
-
+      const t = localStorage.getItem("tokenFirmado");
+      if (t) return t;
     } catch (e) {}
 
-    if (!token) {
+    try {
+      const t = sessionStorage.getItem("tokenFirmado");
+      if (t) return t;
+    } catch (e) {}
 
-      try {
+    try {
+      const match = document.cookie.match(/(?:^|; )tokenFirmado=([^;]*)/);
+      if (match) return decodeURIComponent(match[1]);
+    } catch (e) {}
 
-        token =
-          sessionStorage.getItem(
-            "tokenFirmado"
-          );
-
-      } catch (e) {}
-
-    }
-
-    if (!token) {
-
-      try {
-
-        const match =
-          document.cookie.match(
-            /(?:^|; )tokenFirmado=([^;]*)/
-          );
-
-        if (match) {
-
-          token =
-            decodeURIComponent(
-              match[1]
-            );
-
-        }
-
-      } catch (e) {}
-
-    }
-
-    return token;
-
+    return null;
   },
 
   clear() {
-
+    try { localStorage.removeItem("tokenFirmado"); } catch (e) {}
+    try { sessionStorage.removeItem("tokenFirmado"); } catch (e) {}
     try {
-      localStorage.removeItem(
-        "tokenFirmado"
-      );
-    } catch (e) {}
-
-    try {
-      sessionStorage.removeItem(
-        "tokenFirmado"
-      );
-    } catch (e) {}
-
-    try {
-
       document.cookie =
         "tokenFirmado=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; SameSite=Lax; Secure";
-
     } catch (e) {}
-
   },
 
   exists() {
-
     return !!this.getToken();
-
   }
-
 };
 
 // =====================================================
-// BOOTSTRAP TOKEN
+// BOOTSTRAP TOKEN (desde URL)
 // =====================================================
 function bootstrapToken() {
-
-  const params =
-    new URLSearchParams(
-      window.location.search
-    );
-
-  const token =
-    params.get("token");
-
+  const params = new URLSearchParams(window.location.search);
+  const token = params.get("token");
   if (!token) return;
 
-  Session.setToken(
-    token
-  );
-
-  window.TOKEN =
-    token;
-
-  console.log(
-    "[SESSION] Token almacenado"
-  );
-
+  Session.setToken(token);
+  window.TOKEN = token;
+  log("[SESSION] Token almacenado desde URL");
 }
 
 // =====================================================
 // API FETCH
 // =====================================================
-async function apiFetch({
-  modulo,
-  accion,
-  payload = {}
-}) {
-  // 1. Diagnóstico de captura de token
+async function apiFetch({ modulo, accion, payload = {} }) {
   const token = window.TOKEN;
 
-  console.group(`[APIFETCH] Petición -> Módulo: "${modulo}" | Acción: "${accion}"`);
-  console.log("--> 1. Estado de window.TOKEN al ejecutar apiFetch:", {
-    tokenCapturado: token,
-    tipoDato: typeof token,
-    longitud: token ? token.length : 0
-  });
+  log(`[APIFETCH] ${modulo}.${accion}`, { token: !!token, payload });
 
   try {
     const body = {
@@ -205,70 +105,75 @@ async function apiFetch({
       payload
     };
 
-    // 2. Diagnóstico del JSON final que sale por el red HTTP
-    console.log("--> 2. Body que se enviará en el POST a Apps Script:", body);
-
     const response = await fetch(CONFIG.API_URL, {
       method: "POST",
-      headers: {
-        "Content-Type": "text/plain;charset=utf-8"
-      },
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
       body: JSON.stringify(body)
     });
 
     const data = await response.json();
-    console.log("--> 3. Respuesta cruda del Servidor:", data);
-
+    log(`[APIFETCH] Respuesta ${modulo}.${accion}:`, data);
     return data;
 
   } catch (error) {
-    console.error("❌ [APIFETCH] Error en la petición HTTP:", error);
-
+    logError("[APIFETCH] Error HTTP:", error);
     return {
       ok: false,
       error: error.message || "Error de comunicación"
     };
-  } finally {
-    console.groupEnd();
   }
 }
-//====================================================
-//INICIORETORNO
-//====================================================
+
+// =====================================================
+// INICIO - RETORNO
+// =====================================================
 window.inicio = {
 
   cargarVistaRetorno(res) {
-    console.log("[inicio] cargarVistaRetorno()", res);
+    log("[inicio] cargarVistaRetorno()", res);
 
-    // Si falló la comunicación con el backend
+    // Error de comunicación o del backend
     if (!res || res.ok === false) {
-      console.error("[inicio] Error del backend:", res?.error || res);
+      logError("[inicio] Error:", res?.error || res);
       alert("No se pudo conectar con el servidor:\n" + (res?.error || "Error desconocido"));
-      router("login"); // fallback
+      router("login");
       return;
     }
 
-    const vista =
-      res?.data?.vista ||
-      res?.vista ||
-      res?.payload?.vista ||
-      res?.roles?.principal ||
+    // Roles pueden venir en varias formas
+    const roles =
+      res?.payload?.roles ||
+      res?.data?.roles ||
+      res?.roles ||
       null;
 
-    if (res?.roles) {
-      cargarMenuRolesSecundarios(res.roles);
+    // Si roles es un objeto { principal, secundarios }
+    if (roles && typeof roles === "object" && !Array.isArray(roles)) {
+      cargarMenuRolesSecundarios(roles);
       return;
     }
+
+    // Vista directa
+    const vista =
+      res?.data?.vista ||
+      res?.payload?.vista ||
+      res?.vista ||
+      (typeof roles === "string" ? roles : null) ||
+      null;
 
     if (vista) {
       router(vista);
       return;
     }
 
+    // Fallback
     router("login");
   }
-
 };
+
+// =====================================================
+// MENÚ DE ROLES
+// =====================================================
 function cargarMenuRolesSecundarios(roles) {
   const menu = document.getElementById("menuRolesSecundarios");
   if (!menu) return;
@@ -285,37 +190,37 @@ function cargarMenuRolesSecundarios(roles) {
 
     // Botón del rol principal
     if (typeof rolPrincipal === "string" && rolPrincipal.trim()) {
-      const botonPrincipal = document.createElement("button");
-      botonPrincipal.textContent = rolPrincipal;
-      botonPrincipal.onclick = () => router(rolPrincipal);
-      menu.appendChild(botonPrincipal);
+      const btn = document.createElement("button");
+      btn.textContent = rolPrincipal;
+      btn.onclick = () => router(rolPrincipal);
+      menu.appendChild(btn);
     }
 
-    // Botones de los roles secundarios
+    // Botones secundarios
     rolesSecundarios.forEach(rol => {
       if (typeof rol !== "string" || !rol.trim()) return;
-      if (rol === rolPrincipal) return; // evitar duplicado
+      if (rol === rolPrincipal) return;
 
-      const boton = document.createElement("button");
-      boton.textContent = rol;
-      boton.onclick = () => router(rol);
-      menu.appendChild(boton);
+      const btn = document.createElement("button");
+      btn.textContent = rol;
+      btn.onclick = () => router(rol);
+      menu.appendChild(btn);
     });
   }
 
-  // SIEMPRE mostrar por defecto la vista del rol principal
+  // SIEMPRE mostrar la vista del rol principal
   if (rolPrincipal) {
     router(rolPrincipal);
   }
 }
+
 // =====================================================
 // ARRANQUE
 // =====================================================
 bootstrapToken();
 
-// Exponer objetos globalmente
+// Exponer globalmente
 window.CONFIG = CONFIG;
 window.Session = Session;
 window.apiFetch = apiFetch;
 window.cargarMenuRolesSecundarios = cargarMenuRolesSecundarios;
-
