@@ -37,7 +37,8 @@ window.admin = {
     </div>
   `
 
-console.log("[ADMIN] módulo admin cargado");
+
 
 
 };
+console.log("[ADMIN] módulo admin cargado");
