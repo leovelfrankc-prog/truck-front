@@ -111,8 +111,14 @@ async validarRetorno(res) {
     return;
   }
 
+  // Error de credenciales u otro error del backend
   if (!res.ok) {
-    alert(res.mensaje || res.error || "Credenciales incorrectas");
+    const mensaje =
+      res?.payload?.mensaje ||
+      res?.mensaje ||
+      res?.error ||
+      "Credenciales incorrectas";
+    alert(mensaje);
     return;
   }
 
@@ -121,7 +127,6 @@ async validarRetorno(res) {
 
   if (!token) {
     alert("El servidor no devolvió un token válido.");
-    console.warn("[LOGIN] Respuesta sin token:", res);
     return;
   }
 
@@ -129,12 +134,13 @@ async validarRetorno(res) {
   Session.setToken(token);
   window.TOKEN = token;
   console.log("[LOGIN] Token guardado correctamente");
+  console.log("[LOGIN] Roles recibidos:", roles);
 
-  // Menú de roles o redirección
+  // Menú de roles secundarios (o ir al principal)
   if (roles) {
     cargarMenuRolesSecundarios(roles);
   } else {
-    router("admin"); // fallback
+    console.warn("[LOGIN] No vinieron roles, yendo a admin");
+    router("admin");
   }
-}
 };
