@@ -10,7 +10,6 @@ window.login = {
           <div class="card shadow-sm">
             <div class="card-body">
               <h4 class="text-center mb-3">Iniciar sesión</h4>
-
               <form id="form-login" data-modulo="login">
                 <div class="mb-3">
                   <label class="form-label">Usuario</label>
@@ -19,27 +18,19 @@ window.login = {
                     name="usuario"
                     class="form-control"
                     placeholder="usuario"
-                    data-modulo="login"
-                    data-accion="cambio"
-                    data-campo="usuario"
                     required
                   >
                 </div>
-
                 <div class="mb-3">
                   <label class="form-label">Contraseña</label>
                   <input
                     type="password"
                     name="password"
                     class="form-control"
-                    placeholder="••••••••"
-                    data-modulo="login"
-                    data-accion="cambio"
-                    data-campo="password"
+                    placeholder="password"
                     required
                   >
                 </div>
-
                 <button
                   type="button"
                   class="btn btn-primary w-100"
@@ -48,7 +39,6 @@ window.login = {
                   Entrar
                 </button>
               </form>
-
               <div id="login-mensaje" class="mt-3 text-center"></div>
             </div>
           </div>
@@ -57,9 +47,6 @@ window.login = {
     </div>
   `,
 
-  // ==========================================================
-  // ENVIAR LOGIN
-  // ==========================================================
   async enviar() {
     const form = document.getElementById("form-login");
     if (!form) {
@@ -68,7 +55,7 @@ window.login = {
     }
 
     const formData = new FormData(form);
-    const usuario  = formData.get("usuario");
+    const usuario = formData.get("usuario");
     const password = formData.get("password");
 
     if (!usuario || !password) {
@@ -76,14 +63,8 @@ window.login = {
       return;
     }
 
-    const payload = {
-      usuario,
-      password
-    };
-
     console.log("[LOGIN] Enviando credenciales...");
 
-    // Opcional: mostrar loading
     const btn = form.querySelector("button");
     if (btn) {
       btn.disabled = true;
@@ -91,7 +72,7 @@ window.login = {
     }
 
     try {
-      await controller("login", "validar", payload);
+      await controller("login", "validar", { usuario, password });
     } finally {
       if (btn) {
         btn.disabled = false;
@@ -100,47 +81,44 @@ window.login = {
     }
   },
 
-  // ==========================================================
-  // RETORNO VALIDACIÓN
-  // ==========================================================
-async validarRetorno(res) {
-  console.log("[LOGIN] validarRetorno()", res);
+  async validarRetorno(res) {
+    console.log("[LOGIN] validarRetorno()", res);
 
-  if (!res || typeof res !== "object") {
-    alert("Error inesperado en la respuesta del servidor.");
-    return;
-  }
+    if (!res || typeof res !== "object") {
+      alert("Error inesperado en la respuesta del servidor.");
+      return;
+    }
 
-  // Error de credenciales u otro error del backend
-  if (!res.ok) {
-    const mensaje =
-      res?.payload?.mensaje ||
-      res?.mensaje ||
-      res?.error ||
-      "Credenciales incorrectas";
-    alert(mensaje);
-    return;
-  }
+    if (!res.ok) {
+      const mensaje =
+        res?.payload?.mensaje ||
+        res?.mensaje ||
+        res?.error ||
+        "Credenciales incorrectas";
+      alert(mensaje);
+      return;
+    }
 
-  const token = res?.payload?.token || res?.data?.token || res?.token;
-  const roles = res?.payload?.roles || res?.data?.roles || res?.roles;
+    const token = res?.payload?.token || res?.data?.token || res?.token;
+    const roles = res?.payload?.roles || res?.data?.roles || res?.roles;
 
-  if (!token) {
-    alert("El servidor no devolvió un token válido.");
-    return;
-  }
+    if (!token) {
+      alert("El servidor no devolvió un token válido.");
+      return;
+    }
 
-  // Guardar sesión
-  Session.setToken(token);
-  window.TOKEN = token;
-  console.log("[LOGIN] Token guardado correctamente");
-  console.log("[LOGIN] Roles recibidos:", roles);
+    Session.setToken(token);
+    window.TOKEN = token;
+    console.log("[LOGIN] Token guardado correctamente");
+    console.log("[LOGIN] Roles recibidos:", roles);
 
-  // Menú de roles secundarios (o ir al principal)
-  if (roles) {
-    cargarMenuRolesSecundarios(roles);
-  } else {
-    console.warn("[LOGIN] No vinieron roles, yendo a admin");
-    router("admin");
+    if (roles) {
+      cargarMenuRolesSecundarios(roles);
+    } else {
+      console.warn("[LOGIN] No vinieron roles, yendo a admin");
+      router("admin");
+    }
   }
 };
+
+console.log("[LOGIN] módulo login cargado");
