@@ -155,5 +155,7 @@ window.empresa = {
       alert("Error al procesar la respuesta: " + error.message);
     }
   }
+console.log("[EMPRESA] módulo empresa cargado");
+
 
 };
