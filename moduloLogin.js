@@ -107,7 +107,7 @@ window.login = {
       return;
     }
 
-    Session.setToken(token);
+    
     window.TOKEN = token;
     console.log("[LOGIN] Token guardado correctamente");
     console.log("[LOGIN] Roles recibidos:", roles);
