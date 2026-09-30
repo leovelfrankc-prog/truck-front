@@ -132,42 +132,41 @@ window.inicio = {
   cargarVistaRetorno(res) {
     log("[inicio] cargarVistaRetorno()", res);
 
-    // Error de comunicación o del backend
+    // =========================================================
+    // 1. Validar respuesta del backend
+    // =========================================================
     if (!res || res.ok === false) {
       logError("[inicio] Error:", res?.error || res);
-      alert("No se pudo conectar con el servidor:\n" + (res?.error || "Error desconocido"));
+
+      alert(
+        "No se pudo conectar con el servidor:\n" +
+        (res?.error || "Error desconocido")
+      );
+
       router("login");
       return;
     }
 
-    // Roles pueden venir en varias formas
-    const roles =
-      res?.payload?.roles ||
-      res?.data?.roles ||
-      res?.roles ||
-      null;
+    // =========================================================
+    // 2. La VISTA la decide exclusivamente el backend
+    // =========================================================
+    const vista = res?.data?.vista;
 
-    // Si roles es un objeto { principal, secundarios }
-    if (roles && typeof roles === "object" && !Array.isArray(roles)) {
-      cargarMenuRolesSecundarios(roles);
+    log("[inicio] Vista recibida del backend:", vista);
+
+    // =========================================================
+    // 3. Si el backend no envió una vista válida
+    // =========================================================
+    if (!vista || typeof vista !== "string") {
+      logError("[inicio] El backend no envió una vista válida:", res);
+      router("login");
       return;
     }
 
-    // Vista directa
-    const vista =
-      res?.data?.vista ||
-      res?.payload?.vista ||
-      res?.vista ||
-      (typeof roles === "string" ? roles : null) ||
-      null;
-
-    if (vista) {
-      router(vista);
-      return;
-    }
-
-    // Fallback
-    router("login");
+    // =========================================================
+    // 4. Cargar EXACTAMENTE la vista indicada por el backend
+    // =========================================================
+    router(vista);
   }
 };
 
