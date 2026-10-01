@@ -101,13 +101,13 @@ window.login = {
 
     const token = res?.payload?.token || res?.data?.token || res?.token;
     const roles = res?.payload?.roles || res?.data?.roles || res?.roles;
-
+    const tenant = res?.payload?.tenant || res?.data?.tenant || res?.tenant;
     if (!token) {
       alert("El servidor no devolvió un token válido.");
       return;
     }
 
-    
+    window.TENANT=tenant;
     window.TOKEN = token;
     console.log("[LOGIN] Token guardado correctamente");
     console.log("[LOGIN] Roles recibidos:", roles);
