@@ -12,8 +12,6 @@ window.rh.html
 
 Funciones:
 
-window.rh.usuarios()
-
 window.rh.nuevoUsuario()
 
 window.rh.editarUsuario()
@@ -32,7 +30,7 @@ muestran alertas para comprobar funcionamiento.
 window.rh = {
 
 // ========================================================
-// VISTA PRINCIPAL DEL MÓDULO
+// VISTA PRINCIPAL DE RH
 // ========================================================
 
 html: `
@@ -52,245 +50,171 @@ html: `
                 </h2>
 
                 <div class="text-muted">
-                    Administración de usuarios y empleados
+                    Administración de empleados
                 </div>
 
             </div>
+
+            <button
+                type="button"
+                class="btn btn-primary"
+                onclick="window.rh.nuevoUsuario()"
+            >
+                + Nuevo empleado
+            </button>
 
         </div>
 
 
         <!-- =========================================
-             INDICADORES
-             ========================================= -->
-
-        <div class="row g-3 mb-4">
-
-            <!-- EMPLEADOS -->
-
-            <div class="col-12 col-sm-6 col-lg-3">
-
-                <div class="card h-100 shadow-sm">
-
-                    <div class="card-body">
-
-                        <div class="text-muted small">
-                            EMPLEADOS
-                        </div>
-
-                        <div class="fs-2 fw-bold">
-                            0
-                        </div>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-
-            <!-- ACTIVOS -->
-
-            <div class="col-12 col-sm-6 col-lg-3">
-
-                <div class="card h-100 shadow-sm">
-
-                    <div class="card-body">
-
-                        <div class="text-muted small">
-                            ACTIVOS
-                        </div>
-
-                        <div class="fs-2 fw-bold text-success">
-                            0
-                        </div>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-
-            <!-- INACTIVOS -->
-
-            <div class="col-12 col-sm-6 col-lg-3">
-
-                <div class="card h-100 shadow-sm">
-
-                    <div class="card-body">
-
-                        <div class="text-muted small">
-                            INACTIVOS
-                        </div>
-
-                        <div class="fs-2 fw-bold text-secondary">
-                            0
-                        </div>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-
-            <!-- CHOFERES -->
-
-            <div class="col-12 col-sm-6 col-lg-3">
-
-                <div class="card h-100 shadow-sm">
-
-                    <div class="card-body">
-
-                        <div class="text-muted small">
-                            CHOFERES
-                        </div>
-
-                        <div class="fs-2 fw-bold text-primary">
-                            0
-                        </div>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-        </div>
-
-
-        <!-- =========================================
-             ACCIONES
+             BUSCAR
              ========================================= -->
 
         <div class="card shadow-sm mb-4">
 
+            <div class="card-body">
+
+                <label
+                    for="rhBuscarEmpleado"
+                    class="form-label"
+                >
+                    Buscar empleado
+                </label>
+
+                <input
+                    type="search"
+                    id="rhBuscarEmpleado"
+                    class="form-control"
+                    placeholder="Nombre, email o teléfono..."
+                >
+
+            </div>
+
+        </div>
+
+
+        <!-- =========================================
+             LISTA DE EMPLEADOS
+             ========================================= -->
+
+        <div class="card shadow-sm">
+
             <div class="card-header">
 
                 <strong>
-                    Acciones
+                    Empleados
                 </strong>
 
             </div>
 
 
-            <div class="card-body">
+            <div class="card-body p-0">
 
-                <div class="d-flex flex-wrap gap-2">
+                <div class="table-responsive">
 
-                    <button
-                        type="button"
-                        class="btn btn-primary"
-                        onclick="window.rh.nuevoUsuario()"
-                    >
-                        + Agregar usuario
-                    </button>
+                    <table class="table table-hover mb-0">
 
+                        <thead>
 
-                    <button
-                        type="button"
-                        class="btn btn-outline-primary"
-                        onclick="window.rh.usuarios()"
-                    >
-                        Administrar usuarios
-                    </button>
+                            <tr>
 
-                </div>
+                                <th>
+                                    Nombre
+                                </th>
 
-            </div>
+                                <th>
+                                    Rol principal
+                                </th>
 
-        </div>
+                                <th>
+                                    Estado
+                                </th>
 
+                                <th class="text-end">
+                                    Acciones
+                                </th>
 
-        <!-- =========================================
-             CONTENIDO INFERIOR
-             ========================================= -->
+                            </tr>
 
-        <div class="row g-3">
-
-            <!-- PERSONAL POR ROL -->
-
-            <div class="col-12 col-lg-6">
-
-                <div class="card shadow-sm h-100">
-
-                    <div class="card-header">
-
-                        <strong>
-                            Personal por rol
-                        </strong>
-
-                    </div>
+                        </thead>
 
 
-                    <div class="card-body">
+                        <tbody>
 
-                        <div class="list-group list-group-flush">
+                            <!--
+                                Datos temporales.
+                                Posteriormente serán cargados
+                                desde el backend.
+                            -->
 
-                            <div class="list-group-item d-flex justify-content-between">
-                                <span>Chofer</span>
-                                <span class="badge bg-primary">0</span>
-                            </div>
+                            <tr>
 
-                            <div class="list-group-item d-flex justify-content-between">
-                                <span>Despachador</span>
-                                <span class="badge bg-primary">0</span>
-                            </div>
+                                <td>
+                                    Juan Pérez
+                                </td>
 
-                            <div class="list-group-item d-flex justify-content-between">
-                                <span>Mantenimiento</span>
-                                <span class="badge bg-primary">0</span>
-                            </div>
+                                <td>
+                                    Chofer
+                                </td>
 
-                            <div class="list-group-item d-flex justify-content-between">
-                                <span>RH</span>
-                                <span class="badge bg-primary">0</span>
-                            </div>
+                                <td>
 
-                            <div class="list-group-item d-flex justify-content-between">
-                                <span>Economía</span>
-                                <span class="badge bg-primary">0</span>
-                            </div>
+                                    <span class="badge bg-success">
+                                        Activo
+                                    </span>
 
-                            <div class="list-group-item d-flex justify-content-between">
-                                <span>Admin</span>
-                                <span class="badge bg-primary">0</span>
-                            </div>
+                                </td>
 
-                        </div>
+                                <td class="text-end">
 
-                    </div>
+                                    <div class="btn-group">
 
-                </div>
+                                        <button
+                                            type="button"
+                                            class="btn btn-sm btn-outline-primary"
+                                            onclick="window.rh.editarUsuario('USU_0001')"
+                                        >
+                                            Editar
+                                        </button>
 
-            </div>
+                                        <button
+                                            type="button"
+                                            class="btn btn-sm btn-outline-secondary"
+                                            onclick="window.rh.editarRoles('USU_0001')"
+                                        >
+                                            Roles
+                                        </button>
+
+                                        <button
+                                            type="button"
+                                            class="btn btn-sm btn-outline-warning"
+                                            onclick="window.rh.cambiarEstado('USU_0001')"
+                                        >
+                                            Estado
+                                        </button>
+
+                                    </div>
+
+                                </td>
+
+                            </tr>
 
 
-            <!-- ALTAS RECIENTES -->
+                            <tr>
 
-            <div class="col-12 col-lg-6">
+                                <td
+                                    colspan="4"
+                                    class="text-center text-muted py-4"
+                                >
+                                    Los empleados se cargarán desde el backend.
 
-                <div class="card shadow-sm h-100">
+                                </td>
 
-                    <div class="card-header">
+                            </tr>
 
-                        <strong>
-                            Altas recientes
-                        </strong>
+                        </tbody>
 
-                    </div>
-
-
-                    <div class="card-body">
-
-                        <div class="text-muted text-center py-4">
-
-                            No hay información disponible.
-
-                        </div>
-
-                    </div>
+                    </table>
 
                 </div>
 
@@ -304,30 +228,13 @@ html: `
 
 
 // ========================================================
-// ADMINISTRAR USUARIOS
-// ========================================================
-
-usuarios() {
-
-    alert(
-        "RH → Administrar usuarios"
-    );
-
-    console.log(
-        "[RH] usuarios()"
-    );
-
-},
-
-
-// ========================================================
-// NUEVO USUARIO
+// NUEVO USUARIO / EMPLEADO
 // ========================================================
 
 nuevoUsuario() {
 
     alert(
-        "RH → Agregar usuario"
+        "RH → Nuevo empleado"
     );
 
     console.log(
@@ -338,13 +245,13 @@ nuevoUsuario() {
 
 
 // ========================================================
-// EDITAR USUARIO
+// EDITAR INFORMACIÓN DEL EMPLEADO
 // ========================================================
 
 editarUsuario(idUsuario = null) {
 
     alert(
-        "RH → Editar usuario" +
+        "RH → Editar empleado" +
         (
             idUsuario
                 ? "\nID: " + idUsuario
