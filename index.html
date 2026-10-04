@@ -1,580 +1,155 @@
-<!DOCTYPE html> <html lang="es"> <head>
-<meta charset="UTF-8">
+<!DOCTYPE html> 
+<html lang="es"> 
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Truckero</title>
+  <meta name="theme-color" content="#2563eb">
+  <link rel="manifest" href="manifest.json">
 
-<meta
-    name="viewport"
-    content="width=device-width, initial-scale=1"
->
-
-<title>Truckero</title>
-
-<meta
-    name="theme-color"
-    content="#2563eb"
->
-
-<link
-    rel="manifest"
-    href="manifest.json"
->
-
-
-<!-- ==========================================
-     VERSIÓN DE LA APLICACIÓN
-     ========================================== -->
-
-<script>
+  <!-- VERSIÓN DE LA APLICACIÓN -->
+  <script>
     window.APP_VERSION = "20260929";
-</script>
+  </script>
 
+  <!-- BOOTSTRAP CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
 
-<!-- ==========================================
-     BOOTSTRAP CSS
-     ========================================== -->
+  <!-- ESTILOS PROPIOS -->
+  <link rel="stylesheet" href="estilos.css?v=20260929">
+</head> 
+<body>
 
-<link
-    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
-    rel="stylesheet"
->
-
-
-<!-- ==========================================
-     ESTILOS PROPIOS
-     ========================================== -->
-
-<link
-    rel="stylesheet"
-    href="estilos.css?v=20260929"
->
-
-</head> <body>
-<!-- ==========================================
-     HEADER
-     ========================================== -->
-
-<header id="headerApp">
-
+  <!-- HEADER -->
+  <header id="headerApp">
     <nav id="menuRolesSecundarios">
-        <!-- Aquí se insertan dinámicamente las opciones -->
+      <!-- Aquí se insertan dinámicamente las opciones -->
     </nav>
+  </header>
 
-</header>
+  <!-- CONTENEDOR DE VISTAS -->
+  <main id="vistas">
+    <div>Cargando...</div>
+  </main>
 
-
-<!-- ==========================================
-     CONTENEDOR DE VISTAS
-     ========================================== -->
-
-<main id="vistas">
-
-    <div>
-        Cargando...
+  <!-- MODAL UNIVERSAL -->
+  <div class="modal fade" id="modalUniversal" tabindex="-1" aria-hidden="true">
+    <div id="modalUniversalDialog" class="modal-dialog modal-lg modal-dialog-scrollable">
+      <div class="modal-content" id="modalUniversalContenido"></div>
     </div>
+  </div>
 
-</main>
-
-
-<!-- ==========================================
-     MODAL UNIVERSAL
-     ========================================== -->
-
-<div
-    class="modal fade"
-    id="modalUniversal"
-    tabindex="-1"
-    aria-hidden="true"
->
-
-    <div
-        id="modalUniversalDialog"
-        class="modal-dialog modal-lg modal-dialog-scrollable"
-    >
-
-        <div
-            class="modal-content"
-            id="modalUniversalContenido"
-        ></div>
-
-    </div>
-
-</div>
-
-
-<!-- ==========================================
-     FOOTER
-     ========================================== -->
-
-<footer id="footerApp">
+  <!-- FOOTER -->
+  <footer id="footerApp">
     Truckero
-</footer>
+  </footer>
 
+  <!-- BOOTSTRAP JAVASCRIPT -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
 
-<!-- ==========================================
-     BOOTSTRAP JAVASCRIPT
-     ========================================== -->
+  <!-- SCRIPTS PRINCIPALES -->
+  <script src="utiles.js?v=20260929.2"></script>
+  <script src="router.js?v=20260929.1"></script>
+  <script src="controller.js?v=20260929.1"></script>
+  <script src="listeners.js?v=20260929.1"></script>
 
-<script
-    src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js">
-</script>
+  <!-- MÓDULOS -->
+  <script src="moduloLogin.js?v=20260929"></script>
+  <script src="moduloEmpresa.js?v=20260929"></script>
+  <script src="moduloAdmin.js?v=20260929"></script>
+  <script src="moduloRH.js?v=9"></script>
+  <script src="moduloChofer.js?v=20260929"></script>
 
+  <!-- UTILIDADES -->
+  <script src="utilesModal.js?v=20260929"></script>
+  <script src="utilesFormularios.js?v=20260929"></script>
+  <script src="utilesTablas.js?v=20260929"></script>
 
-<!-- ==========================================
-     SCRIPTS PRINCIPALES
-     ========================================== -->
-
-<script src="utiles.js?v=20260929.2"></script>
-<script src="router.js?v=20260929.1"></script>
-<script src="controller.js?v=20260929.1"></script>
-<script src="listeners.js?v=20260929.1"></script>
-
-
-<!-- ==========================================
-     MÓDULOS
-     ========================================== -->
-
-<script src="moduloLogin.js?v=20260929"></script>
-<script src="moduloEmpresa.js?v=20260929"></script>
-<script src="moduloAdmin.js?v=20260929"></script>
-<script src="moduloRH.js?v=9"></script>
-<script src="moduloChofer.js?v=20260929"></script>
-
-
-<!-- ==========================================
-     UTILIDADES
-     ========================================== -->
-
-<script src="utilesModal.js?v=20260929"></script>
-<script src="utilesFormularios.js?v=20260929"></script>
-<script src="utilesTablas.js?v=20260929"></script>
-
-
-<!-- ==========================================
-     INICIALIZACIÓN DE TRUCKERO
-     ========================================== -->
-
-<script>
-
-    /*
-     * ==========================================
-     * TOKEN GLOBAL
-     * ==========================================
-     */
-
+  <!-- INICIALIZACIÓN DE TRUCKERO -->
+  <script>
     window.TOKEN = null;
 
-
-    /*
-     * ==========================================
-     * MOSTRAR ERROR
-     * ==========================================
-     */
-
     function mostrarError(titulo, contenido) {
+      const vistas = document.getElementById('vistas');
+      if (!vistas) return;
 
-        const vistas =
-            document.getElementById('vistas');
+      vistas.innerHTML = `
+        <div style="padding:20px; font-family:monospace; color:#b91c1c; white-space:pre-wrap; word-break:break-word;">
+          ${titulo}\n\n${contenido}
+        </div>`;
+    }
 
-        if (!vistas) {
-            return;
-        }
-
-        vistas.innerHTML = `
-            <div
-                style="
-                    padding:20px;
-                    font-family:monospace;
-                    color:#b91c1c;
-                    white-space:pre-wrap;
-                    word-break:break-word;
-                "
-            >
-                ${titulo}
-
-
-${contenido}
-</div>
-`;
-}
-
-    /*
-     * ==========================================
-     * ERROR JAVASCRIPT GLOBAL
-     * ==========================================
-     */
-
-    window.onerror = function(
-        mensaje,
-        archivo,
-        linea,
-        columna,
-        error
-    ) {
-
-        mostrarError(
-            'ERROR JAVASCRIPT',
-
-            `Mensaje:
-
-
-${mensaje}
-
-Archivo:
-${archivo}
-
-Línea:
-${linea}
-
-Columna:
-${columna}
-
-Stack:
-${error?.stack || 'No disponible'}`
-);
-
-        return true;
+    /* Manejo de Errores Globales */
+    window.onerror = function(mensaje, archivo, linea, columna, error) {
+      mostrarError(
+        'ERROR JAVASCRIPT',
+        `Mensaje:\n${mensaje}\n\nArchivo:\n${archivo}\n\nLínea:\n${linea}\n\nColumna:\n${columna}\n\nStack:\n${error?.stack || 'No disponible'}`
+      );
+      return true;
     };
 
+    window.addEventListener('unhandledrejection', event => {
+      let detalle;
+      try {
+        detalle = event.reason?.stack || JSON.stringify(event.reason, null, 2) || String(event.reason);
+      } catch (e) {
+        detalle = String(event.reason);
+      }
+      mostrarError('ERROR PROMESA', detalle);
+    });
 
-    /*
-     * ==========================================
-     * PROMESAS NO CONTROLADAS
-     * ==========================================
-     */
-
-    window.addEventListener(
-        'unhandledrejection',
-        event => {
-
-            let detalle;
-
-            try {
-
-                detalle =
-                    event.reason?.stack ||
-                    JSON.stringify(
-                        event.reason,
-                        null,
-                        2
-                    ) ||
-                    String(event.reason);
-
-            } catch (error) {
-
-                detalle =
-                    String(event.reason);
-
-            }
-
-            mostrarError(
-                'ERROR PROMESA',
-                detalle
-            );
-
-        }
-    );
-
-
-    /*
-     * ==========================================
-     * SERVICE WORKER
-     * ==========================================
-     */
-
+    /* Función Simplificada del Service Worker */
     async function registrarServiceWorker() {
+      if (!('serviceWorker' in navigator)) return;
 
-        if (!('serviceWorker' in navigator)) {
+      try {
+        const registro = await navigator.serviceWorker.register(`./sw.js?v=${window.APP_VERSION}`);
+        console.log('[SW] Registrado en scope:', registro.scope);
+        
+        // Escuchar mensajes provenientes del Service Worker
+        navigator.serviceWorker.addEventListener('message', e => console.log('[SW] Mensaje:', e.data));
 
-            console.warn(
-                '[SW] Service Worker no soportado'
-            );
-
-            return null;
-        }
-
-
-        try {
-
-            const registro =
-                await navigator.serviceWorker.register(
-                    './sw.js?v=' +
-                    window.APP_VERSION
-                );
-
-
-            console.log(
-                '[SW] Registrado correctamente'
-            );
-
-            console.log(
-                '[SW] Scope:',
-                registro.scope
-            );
-
-
-            /*
-             * Comprobar si existe una versión
-             * nueva del Service Worker.
-             */
-
-            try {
-
-                await registro.update();
-
-                console.log(
-                    '[SW] Comprobación de actualización realizada'
-                );
-
-            } catch (error) {
-
-                console.warn(
-                    '[SW] No se pudo comprobar actualización:',
-                    error
-                );
-
-            }
-
-
-            /*
-             * Detectar nueva versión.
-             */
-
-            registro.addEventListener(
-                'updatefound',
-                () => {
-
-                    console.log(
-                        '[SW] Nueva versión detectada'
-                    );
-
-                    const nuevoSW =
-                        registro.installing;
-
-                    if (!nuevoSW) {
-                        return;
-                    }
-
-
-                    nuevoSW.addEventListener(
-                        'statechange',
-                        () => {
-
-                            console.log(
-                                '[SW] Estado:',
-                                nuevoSW.state
-                            );
-
-
-                            if (
-                                nuevoSW.state ===
-                                'activated'
-                            ) {
-
-                                console.log(
-                                    '[SW] Nueva versión activada'
-                                );
-
-                            }
-
-                        }
-                    );
-
-                }
-            );
-
-
-            /*
-             * Información de diagnóstico.
-             */
-
-            if (registro.active) {
-
-                registro.active.postMessage({
-                    accion: 'PING'
-                });
-
-            }
-
-
-            return registro;
-
-        } catch (error) {
-
-            console.warn(
-                '[SW] Error registrando Service Worker:',
-                error
-            );
-
-            return null;
-        }
+        return registro;
+      } catch (error) {
+        console.warn('[SW] Error al registrar:', error);
+      }
     }
 
+    /* Inicio de la Aplicación */
+    document.addEventListener('DOMContentLoaded', async () => {
+      try {
+        console.log('=====================================');
+        console.log('[TRUCKERO] INICIANDO APLICACIÓN');
+        console.log('[TRUCKERO] VERSION:', window.APP_VERSION);
 
-    /*
-     * ==========================================
-     * RESPUESTAS DEL SERVICE WORKER
-     * ==========================================
-     */
+        // 1. Manejo del Token desde la URL
+        const params = new URLSearchParams(window.location.search);
+        const tokenUrl = params.get('token');
 
-    if ('serviceWorker' in navigator) {
-
-        navigator.serviceWorker.addEventListener(
-            'message',
-            event => {
-
-                console.log(
-                    '[SW] Mensaje:',
-                    event.data
-                );
-
-            }
-        );
-
-    }
-
-
-    /*
-     * ==========================================
-     * INICIO DE LA APLICACIÓN
-     * ==========================================
-     */
-
-    document.addEventListener(
-        'DOMContentLoaded',
-        async () => {
-
-            try {
-
-                console.log(
-                    '====================================='
-                );
-
-                console.log(
-                    '[TRUCKERO] INICIANDO APLICACIÓN'
-                );
-
-                console.log(
-                    '[TRUCKERO] VERSION:',
-                    window.APP_VERSION
-                );
-
-                console.log(
-                    '[TRUCKERO] URL:',
-                    window.location.href
-                );
-
-
-                /*
-                 * ==================================
-                 * 1. CAPTURAR TOKEN DE URL
-                 * ==================================
-                 */
-
-                const params =
-                    new URLSearchParams(
-                        window.location.search
-                    );
-
-                const tokenUrl =
-                    params.get('token');
-
-
-                /*
-                 * ==================================
-                 * 2. GUARDAR TOKEN
-                 * ==================================
-                 */
-
-                if (tokenUrl) {
-
-                    Session.setToken(
-                        tokenUrl
-                    );
-
-                    console.log(
-                        '[TRUCKERO] Token guardado desde URL'
-                    );
-
-
-                    /*
-                     * Limpiar token de URL.
-                     */
-
-                    const cleanUrl =
-                        window.location.origin +
-                        window.location.pathname;
-
-                    window.history.replaceState(
-                        {},
-                        document.title,
-                        cleanUrl
-                    );
-
-                }
-
-
-                /*
-                 * ==================================
-                 * 3. ACTUALIZAR TOKEN GLOBAL
-                 * ==================================
-                 */
-
-                window.TOKEN =
-                    Session.getToken();
-
-
-                /*
-                 * ==================================
-                 * 4. REGISTRAR SERVICE WORKER
-                 * ==================================
-                 */
-
-                await registrarServiceWorker();
-
-
-                /*
-                 * ==================================
-                 * 5. INICIAR CONTROLADOR
-                 * ==================================
-                 */
-
-                console.log(
-                    '[TRUCKERO] Ejecutando controlador inicial...'
-                );
-
-                await controller(
-                    'inicio',
-                    'cargarVista'
-                );
-
-
-                console.log(
-                    '[TRUCKERO] Aplicación iniciada'
-                );
-
-                console.log(
-                    '====================================='
-                );
-
-
-            } catch (error) {
-
-                console.error(
-                    '[TRUCKERO] Error iniciando Truckero:',
-                    error
-                );
-
-                mostrarError(
-                    'ERROR INICIANDO TRUCKERO',
-                    error?.stack ||
-                    error?.message ||
-                    String(error)
-                );
-
-            }
-
+        if (tokenUrl) {
+          Session.setToken(tokenUrl);
+          const cleanUrl = window.location.origin + window.location.pathname;
+          window.history.replaceState({}, document.title, cleanUrl);
         }
-    );
 
-</script>
+        window.TOKEN = Session.getToken();
 
-</body> </html>
+        // 2. Registrar Service Worker
+        await registrarServiceWorker();
+
+        // 3. Iniciar Controlador
+        console.log('[TRUCKERO] Ejecutando controlador inicial...');
+        await controller('inicio', 'cargarVista');
+
+        console.log('[TRUCKERO] Aplicación iniciada');
+        console.log('=====================================');
+
+      } catch (error) {
+        console.error('[TRUCKERO] Error iniciando:', error);
+        mostrarError('ERROR INICIANDO TRUCKERO', error?.stack || error?.message || String(error));
+      }
+    });
+  </script>
+
+</body> 
+</html>
