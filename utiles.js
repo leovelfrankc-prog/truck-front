@@ -179,40 +179,42 @@ function cargarMenuRolesSecundarios(roles) {
 
   menu.innerHTML = "";
 
-  const rolPrincipal = roles?.principal;
+  // Normalizar el rol principal a minúsculas
+  const rolPrincipal = roles?.principal ? String(roles.principal).toLowerCase().trim() : null;
+  
   const rolesSecundarios = Array.isArray(roles?.secundarios)
     ? roles.secundarios
     : [];
 
-  // Solo crear botones si hay al menos un rol secundario
-  if (rolesSecundarios.length > 0) {
+  // Filtrar secundarios válidos evitando duplicar el principal
+  const secundariosFiltrados = rolesSecundarios
+    .map(rol => String(rol).toLowerCase().trim())
+    .filter(rol => rol && rol !== rolPrincipal);
 
-    // Botón del rol principal
-    if (typeof rolPrincipal === "string" && rolPrincipal.trim()) {
+  // Crear botones solo si existen roles secundarios
+  if (secundariosFiltrados.length > 0) {
+    const todosLosRoles = [rolPrincipal, ...secundariosFiltrados].filter(Boolean);
+
+    todosLosRoles.forEach(rol => {
       const btn = document.createElement("button");
-      btn.textContent = rolPrincipal;
-      btn.onclick = () => router(rolPrincipal);
-      menu.appendChild(btn);
-    }
-
-    // Botones secundarios
-    rolesSecundarios.forEach(rol => {
-      if (typeof rol !== "string" || !rol.trim()) return;
-      if (rol === rolPrincipal) return;
-
-      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "btn btn-primary w-100";
+      
+      // Atributos para que los capture tu listener universal
+      btn.dataset.modulo = rol;
+      btn.dataset.accion = `init-${rol}`;
+      
       btn.textContent = rol;
-      btn.onclick = () => router(rol);
+      
       menu.appendChild(btn);
     });
   }
 
-  // SIEMPRE mostrar la vista del rol principal
-  if (rolPrincipal) {
-    router(rolPrincipal);
+  // Carga inicial del módulo principal al arrancar la app
+  if (rolPrincipal && window.modulo && typeof window.modulo[`init-${rolPrincipal}`] === "function") {
+    window.modulo[`init-${rolPrincipal}`]();
   }
 }
-
 // =====================================================
 // ARRANQUE
 // =====================================================
