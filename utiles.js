@@ -211,7 +211,7 @@ function cargarMenuRolesSecundarios(roles) {
   }
 
   // Carga inicial del módulo principal al arrancar la app
-  if (rolPrincipal && window.modulo && typeof window.modulo[`init-${rolPrincipal}`] === "function") {
+  if (rolPrincipal && window.rolPrincipal && typeof window.rolPrincipal[`init-${rolPrincipal}`] === "function") {
     window.rolPrincipal[`init-${rolPrincipal}`]();
   }
 }
