@@ -98,8 +98,8 @@ function bootstrapToken() {
 // =====================================================
 async function apiFetch({ modulo, accion, payload = {} }) {
   const token = window.TOKEN;
-
-  log(`[APIFETCH] ${modulo}.${accion}`, { token: !!token, payload });
+alert("url: " + window.API_URL);
+  log(`[APIFETCH] ${modulo}.${accion}`, { token: !!token, payload,window.API_URL });
 
   try {
     const body = {
