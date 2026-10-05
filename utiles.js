@@ -8,7 +8,7 @@
 // CONFIGURACIÓN GLOBAL
 // =====================================================
 const CONFIG = {
-  API_URL: "https://script.google.com/macros/s/AKfycbx0WTI9ZLEC_ArJdkjYHplPSjXy3Xthc289eBaK894tC4ZREbrRaL_1IandKCaSYOZ85w/exec",
+  
   DEBUG: true // ponlo en false en producción para silenciar logs
 };
 
@@ -105,7 +105,7 @@ async function apiFetch({ modulo, accion, payload = {} }) {
       payload
     };
 
-    const response = await fetch(CONFIG.API_URL, {
+    const response = await fetch(window.url, {
       method: "POST",
       headers: { "Content-Type": "text/plain;charset=utf-8" },
       body: JSON.stringify(body)
