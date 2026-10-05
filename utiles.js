@@ -105,7 +105,7 @@ async function apiFetch({ modulo, accion, payload = {} }) {
       payload
     };
 
-    const response = await fetch(window.url, {
+    const response = await fetch(window.API_URL, {
       method: "POST",
       headers: { "Content-Type": "text/plain;charset=utf-8" },
       body: JSON.stringify(body)
@@ -151,7 +151,7 @@ window.inicio = {
     // 2. La VISTA la decide exclusivamente el backend
     // =========================================================
     const vista = res?.data?.vista;
-    window.url = res?.data?.url;
+    window.API_URL = res?.data?.url;
     
     log("[inicio] Vista recibida del backend:", vista);
 
