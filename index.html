@@ -10,6 +10,9 @@
   <!-- VERSIÓN DE LA APLICACIÓN -->
   <script>
     window.APP_VERSION = "20260929";
+    // 1. DECLARAMOS LA URL BASE GLOBAL ANTES DE CUALQUIER OTRO SCRIPT
+    window.API_URL = "https://script.google.com/macros/s/AKfycbx0WTI9ZLEC_ArJdkjYHplPSjXy3Xthc289eBaK894tC4ZREbrRaL_1IandKCaSYOZ85w/exec";
+    window.TOKEN = null;
   </script>
 
   <!-- BOOTSTRAP CSS -->
@@ -67,8 +70,6 @@
 
   <!-- INICIALIZACIÓN DE TRUCKERO -->
   <script>
-    window.TOKEN = null;
-
     function mostrarError(titulo, contenido) {
       const vistas = document.getElementById('vistas');
       if (!vistas) return;
@@ -80,28 +81,27 @@
     }
 
     /* Manejo de Errores Globales */
-window.onerror = function(mensaje, archivo, linea, columna, error) {
+    window.onerror = function(mensaje, archivo, linea, columna, error) {
+      console.log("[ONERROR]");
+      console.log("mensaje:", mensaje);
+      console.log("archivo:", archivo);
+      console.log("linea:", linea);
+      console.log("columna:", columna);
+      console.log("error:", error);
 
-  console.log("[ONERROR]");
-  console.log("mensaje:", mensaje);
-  console.log("archivo:", archivo);
-  console.log("linea:", linea);
-  console.log("columna:", columna);
-  console.log("error:", error);
+      if (mensaje === "Script error." && linea === 0) {
+        console.warn("[SAFARI] Script error ignorado");
+        return true;
+      }
 
-  // IGNORAR los Script error genéricos de Safari
-  if (mensaje === "Script error." && linea === 0) {
-    console.warn("[SAFARI] Script error ignorado");
-    return true;
-  }
+      mostrarError(
+        'ERROR JAVASCRIPT',
+        `Mensaje:\n${mensaje}\n\nArchivo:\n${archivo}\n\nLínea:\n${linea}\n\nColumna:\n${columna}\n\nStack:\n${error?.stack || 'No disponible'}`
+      );
 
-  mostrarError(
-    'ERROR JAVASCRIPT',
-    `Mensaje:\n${mensaje}\n\nArchivo:\n${archivo}\n\nLínea:\n${linea}\n\nColumna:\n${columna}\n\nStack:\n${error?.stack || 'No disponible'}`
-  );
+      return true;
+    };
 
-  return true;
-};
     window.addEventListener('unhandledrejection', event => {
       let detalle;
       try {
@@ -120,7 +120,6 @@ window.onerror = function(mensaje, archivo, linea, columna, error) {
         const registro = await navigator.serviceWorker.register(`./sw.js?v=${window.APP_VERSION}`);
         console.log('[SW] Registrado en scope:', registro.scope);
         
-        // Escuchar mensajes provenientes del Service Worker
         navigator.serviceWorker.addEventListener('message', e => console.log('[SW] Mensaje:', e.data));
 
         return registro;
@@ -147,7 +146,7 @@ window.onerror = function(mensaje, archivo, linea, columna, error) {
         }
 
         window.TOKEN = Session.getToken();
-        window.url = "https://script.google.com/macros/s/AKfycbx0WTI9ZLEC_ArJdkjYHplPSjXy3Xthc289eBaK894tC4ZREbrRaL_1IandKCaSYOZ85w/exec";
+
         // 2. Registrar Service Worker
         await registrarServiceWorker();
 
