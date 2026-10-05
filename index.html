@@ -80,14 +80,28 @@
     }
 
     /* Manejo de Errores Globales */
-    window.onerror = function(mensaje, archivo, linea, columna, error) {
-      mostrarError(
-        'ERROR JAVASCRIPT',
-        `Mensaje:\n${mensaje}\n\nArchivo:\n${archivo}\n\nLínea:\n${linea}\n\nColumna:\n${columna}\n\nStack:\n${error?.stack || 'No disponible'}`
-      );
-      return true;
-    };
+window.onerror = function(mensaje, archivo, linea, columna, error) {
 
+  console.log("[ONERROR]");
+  console.log("mensaje:", mensaje);
+  console.log("archivo:", archivo);
+  console.log("linea:", linea);
+  console.log("columna:", columna);
+  console.log("error:", error);
+
+  // IGNORAR los Script error genéricos de Safari
+  if (mensaje === "Script error." && linea === 0) {
+    console.warn("[SAFARI] Script error ignorado");
+    return true;
+  }
+
+  mostrarError(
+    'ERROR JAVASCRIPT',
+    `Mensaje:\n${mensaje}\n\nArchivo:\n${archivo}\n\nLínea:\n${linea}\n\nColumna:\n${columna}\n\nStack:\n${error?.stack || 'No disponible'}`
+  );
+
+  return true;
+};
     window.addEventListener('unhandledrejection', event => {
       let detalle;
       try {
