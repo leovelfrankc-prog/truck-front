@@ -11,6 +11,11 @@ const CONFIG = {
   
   DEBUG: true // ponlo en false en producción para silenciar logs
 };
+const DEFAULT_API_URL = "https://script.google.com/macros/s/AKfycbx0WTI9ZLEC_ArJdkjYHplPSjXy3Xthc289eBaK894tC4ZREbrRaL_1IandKCaSYOZ85w/exec";
+
+if (!window.API_URL) {
+  window.API_URL = DEFAULT_API_URL;
+}
 
 // =====================================================
 // HELPERS DE LOG
