@@ -151,7 +151,8 @@ window.inicio = {
     // 2. La VISTA la decide exclusivamente el backend
     // =========================================================
     const vista = res?.data?.vista;
-
+    window.url = res?.data?.url;
+    
     log("[inicio] Vista recibida del backend:", vista);
 
     // =========================================================
