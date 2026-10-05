@@ -8,9 +8,9 @@
 // CONFIGURACIÓN GLOBAL
 // =====================================================
 const CONFIG = {
-  
   DEBUG: true // ponlo en false en producción para silenciar logs
 };
+
 const DEFAULT_API_URL = "https://script.google.com/macros/s/AKfycbx0WTI9ZLEC_ArJdkjYHplPSjXy3Xthc289eBaK894tC4ZREbrRaL_1IandKCaSYOZ85w/exec";
 
 if (!window.API_URL) {
@@ -80,6 +80,9 @@ const Session = {
   }
 };
 
+// Exponer inmediatamente
+window.Session = Session;
+
 // =====================================================
 // BOOTSTRAP TOKEN (desde URL)
 // =====================================================
@@ -97,20 +100,23 @@ function bootstrapToken() {
 // API FETCH
 // =====================================================
 async function apiFetch({ modulo, accion, payload = {} }) {
-  const token = window.TOKEN;
-alert("url: " + window.API_URL);
-  log(`[APIFETCH] ${modulo}.${accion}`, { token: !!token, payload,window.API_URL });
+  const token = window.TOKEN || Session.getToken();
+  const endpoint = window.API_URL || DEFAULT_API_URL;
+
+  log(`[APIFETCH] ${modulo}.${accion}`, { token: !!token, payload, targetUrl: endpoint });
 
   try {
     const body = {
-      requestId: crypto.randomUUID(),
+      requestId: (typeof crypto !== "undefined" && crypto.randomUUID) 
+        ? crypto.randomUUID() 
+        : 'req-' + Date.now() + '-' + Math.random().toString(36).substring(2, 9),
       modulo,
       accion,
       tokenFirmado: token,
       payload
     };
 
-    const response = await fetch(window.API_URL, {
+    const response = await fetch(endpoint, {
       method: "POST",
       headers: { "Content-Type": "text/plain;charset=utf-8" },
       body: JSON.stringify(body)
@@ -129,6 +135,9 @@ alert("url: " + window.API_URL);
   }
 }
 
+// Exponer inmediatamente
+window.apiFetch = apiFetch;
+
 // =====================================================
 // INICIO - RETORNO
 // =====================================================
@@ -137,9 +146,7 @@ window.inicio = {
   cargarVistaRetorno(res) {
     log("[inicio] cargarVistaRetorno()", res);
 
-    // =========================================================
     // 1. Validar respuesta del backend
-    // =========================================================
     if (!res || res.ok === false) {
       logError("[inicio] Error:", res?.error || res);
 
@@ -152,26 +159,22 @@ window.inicio = {
       return;
     }
 
-    // =========================================================
     // 2. La VISTA la decide exclusivamente el backend
-    // =========================================================
     const vista = res?.data?.vista;
-    window.API_URL = res?.data?.url;
+    if (res?.data?.url) {
+      window.API_URL = res.data.url;
+    }
     
     log("[inicio] Vista recibida del backend:", vista);
 
-    // =========================================================
     // 3. Si el backend no envió una vista válida
-    // =========================================================
     if (!vista || typeof vista !== "string") {
       logError("[inicio] El backend no envió una vista válida:", res);
       router("login");
       return;
     }
 
-    // =========================================================
     // 4. Cargar EXACTAMENTE la vista indicada por el backend
-    // =========================================================
     router(vista);
   }
 };
@@ -185,19 +188,16 @@ function cargarMenuRolesSecundarios(roles) {
 
   menu.innerHTML = "";
 
-  // Normalizar el rol principal a minúsculas
   const rolPrincipal = roles?.principal ? String(roles.principal).toLowerCase().trim() : null;
   
   const rolesSecundarios = Array.isArray(roles?.secundarios)
     ? roles.secundarios
     : [];
 
-  // Filtrar secundarios válidos evitando duplicar el principal
   const secundariosFiltrados = rolesSecundarios
     .map(rol => String(rol).toLowerCase().trim())
     .filter(rol => rol && rol !== rolPrincipal);
 
-  // Crear botones solo si existen roles secundarios
   if (secundariosFiltrados.length > 0) {
     const todosLosRoles = [rolPrincipal, ...secundariosFiltrados].filter(Boolean);
 
@@ -206,28 +206,27 @@ function cargarMenuRolesSecundarios(roles) {
       btn.type = "button";
       btn.className = "btn btn-primary w-100";
       
-      // Atributos para que los capture tu listener universal
       btn.dataset.modulo = rol;
       btn.dataset.accion = `init-${rol}`;
-      
       btn.textContent = rol;
       
       menu.appendChild(btn);
     });
   }
 
-  // Carga inicial del módulo principal al arrancar la app
   if (rolPrincipal && window.rolPrincipal && typeof window.rolPrincipal[`init-${rolPrincipal}`] === "function") {
     window.rolPrincipal[`init-${rolPrincipal}`]();
   }
 }
+
 // =====================================================
 // ARRANQUE
 // =====================================================
 bootstrapToken();
 
-// Exponer globalmente
+// EXPORTACIONES GLOBALES
 window.CONFIG = CONFIG;
-window.Session = Session;
-window.apiFetch = apiFetch;
+window.log = log;
+window.logError = logError;
+window.bootstrapToken = bootstrapToken;
 window.cargarMenuRolesSecundarios = cargarMenuRolesSecundarios;
