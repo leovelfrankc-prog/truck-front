@@ -123,34 +123,40 @@
       }
     }
 
-    /* Inicio de la Aplicación */
+/* Inicio de la Aplicación */
     document.addEventListener('DOMContentLoaded', async () => {
       try {
         console.log('=====================================');
         console.log('[TRUCKERO] INICIANDO APLICACIÓN');
         console.log('[TRUCKERO] VERSION:', window.APP_VERSION);
 
-        // 1. Delegar lectura y guardado del Token a utiles.js
-        if (typeof bootstrapToken === 'function') {
-          bootstrapToken();
+        // 1. Extraer token de la URL
+        const params = new URLSearchParams(window.location.search);
+        const tokenUrl = params.get('token');
+
+        // 2. Si viene token en la URL, guardarlo en la Session
+        if (tokenUrl && typeof Session !== 'undefined' && Session.setToken) {
+          Session.setToken(tokenUrl);
+          console.log('[TRUCKERO] Token recibido desde URL y guardado en Session');
         }
 
-        // Limpiar parámetro 'token' de la URL
-        const params = new URLSearchParams(window.location.search);
-        if (params.has('token')) {
+        // 3. Limpiar la URL sólo después de haber procesado y guardado el token
+        if (tokenUrl) {
           const cleanUrl = window.location.origin + window.location.pathname;
           window.history.replaceState({}, document.title, cleanUrl);
         }
 
-        // Obtener el token de forma segura
-        window.TOKEN = (typeof Session !== 'undefined' && Session.getToken) 
-          ? Session.getToken() 
-          : window.TOKEN;
+        // 4. Asignar window.TOKEN desde Session
+        if (typeof Session !== 'undefined' && Session.getToken) {
+          window.TOKEN = Session.getToken();
+        }
 
-        // 2. Registrar Service Worker
+        console.log('[TRUCKERO] Token listo para peticiones:', !!window.TOKEN);
+
+        // 5. Registrar Service Worker
         await registrarServiceWorker();
 
-        // 3. Iniciar Controlador
+        // 6. Iniciar Controlador
         console.log('[TRUCKERO] Ejecutando controlador inicial...');
         await controller('inicio', 'cargarVista');
 
@@ -161,8 +167,7 @@
         console.error('[TRUCKERO] Error iniciando:', error);
         mostrarError('ERROR INICIANDO TRUCKERO', error?.stack || error?.message || String(error));
       }
-    });
-  </script>
+    });  </script>
 
 </body> 
 </html>
