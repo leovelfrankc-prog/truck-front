@@ -82,12 +82,7 @@
 
     /* Manejo de Errores Globales */
     window.onerror = function(mensaje, archivo, linea, columna, error) {
-      console.log("[ONERROR]");
-      console.log("mensaje:", mensaje);
-      console.log("archivo:", archivo);
-      console.log("linea:", linea);
-      console.log("columna:", columna);
-      console.log("error:", error);
+      console.log("[ONERROR]", { mensaje, archivo, linea, columna, error });
 
       if (mensaje === "Script error." && linea === 0) {
         console.warn("[SAFARI] Script error ignorado");
@@ -135,17 +130,22 @@
         console.log('[TRUCKERO] INICIANDO APLICACIÓN');
         console.log('[TRUCKERO] VERSION:', window.APP_VERSION);
 
-        // 1. Manejo del Token desde la URL
-        const params = new URLSearchParams(window.location.search);
-        const tokenUrl = params.get('token');
+        // 1. Delegar lectura y guardado del Token a utiles.js
+        if (typeof bootstrapToken === 'function') {
+          bootstrapToken();
+        }
 
-        if (tokenUrl) {
-          Session.setToken(tokenUrl);
+        // Limpiar parámetro 'token' de la URL
+        const params = new URLSearchParams(window.location.search);
+        if (params.has('token')) {
           const cleanUrl = window.location.origin + window.location.pathname;
           window.history.replaceState({}, document.title, cleanUrl);
         }
 
-        window.TOKEN = Session.getToken();
+        // Obtener el token de forma segura
+        window.TOKEN = (typeof Session !== 'undefined' && Session.getToken) 
+          ? Session.getToken() 
+          : window.TOKEN;
 
         // 2. Registrar Service Worker
         await registrarServiceWorker();
