@@ -32,7 +32,10 @@ window.rh = {
 // ========================================================
 // VISTA PRINCIPAL DE RH
 // ========================================================
-
+"init-rh":function(){
+    router("rh");
+}
+    ,
 html: `
 
 <section class="container-fluid py-3" id="rrhh-dashboard">
