@@ -101,7 +101,7 @@ function bootstrapToken() {
 // =====================================================
 async function apiFetch({ modulo, accion, payload = {} }) {
   const token = window.TOKEN || Session.getToken();
-  const endpoint = window.API_URL || DEFAULT_API_URL;
+  const endpoint = DEFAULT_API_URL || DEFAULT_API_URL;
 
   log(`[APIFETCH] ${modulo}.${accion}`, { token: !!token, payload, targetUrl: endpoint });
 
@@ -161,9 +161,7 @@ window.inicio = {
 
     // 2. La VISTA la decide exclusivamente el backend
     const vista = res?.data?.vista;
-    if (res?.data?.url) {
-      window.API_URL = res.data.url;
-    }
+   
     
     log("[inicio] Vista recibida del backend:", vista);
 
