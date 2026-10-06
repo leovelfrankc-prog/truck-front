@@ -17,7 +17,57 @@ function init_empresa(initData) {
 window.empresa = {
 
   // ---------- HTML del formulario (déjalo como lo tengas) ----------
-  // html: `... tu HTML actual ...`,
+  html: `<div class="container mt-4">
+  <h2>Registrar Empresa</h2>
+  <p class="text-muted">Complete la información para crear la empresa</p>
+
+  <form id="formRegistrarEmpresa">
+    <div class="mb-3">
+      <label class="form-label">Nombre de la empresa</label>
+      <input type="text" name="nombreEmpresa" class="form-control" required>
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label">Nombre del administrador</label>
+      <input type="text" name="nombreAdmin" class="form-control" required>
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label">Email del administrador</label>
+      <input type="email" name="emailAdmin" class="form-control" required>
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label">Móvil del administrador</label>
+      <input type="tel" name="movilAdmin" class="form-control" required>
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label">Contraseña</label>
+      <input type="password" name="password1" class="form-control" required>
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label">Repetir contraseña</label>
+      <input type="password" name="password2" class="form-control" required>
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label">Logo de la empresa</label>
+      <input type="file" name="logoEmpresa" class="form-control" accept="image/*" required>
+    </div>
+
+    <button type="button"
+            class="btn btn-primary w-100"
+            data-modulo="empresa"
+            data-accion="registrar"
+            data-origen="vista_registrarEmpresa">
+      Registrar Empresa
+    </button>
+  </form>
+
+  <div id="resultadoRegistrarEmpresa" class="mt-4"></div>
+</div>`,
 
   // =====================================================
   // REGISTRAR EMPRESA
