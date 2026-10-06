@@ -381,3 +381,5 @@ window.rh = {
     }
 
 };
+
+console.log("[rh] módulo rh cargado");
