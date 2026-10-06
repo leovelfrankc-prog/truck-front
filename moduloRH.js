@@ -1,43 +1,31 @@
 /**
-
 ============================================================
-
 MÓDULO RECURSOS HUMANOS
-
 ============================================================
-
 Vista principal:
-
 window.rh.html
 
 Funciones:
-
 window.rh.nuevoUsuario()
-
 window.rh.editarUsuario()
-
 window.rh.editarRoles()
-
 window.rh.cambiarEstado()
 
 Por el momento las funciones solamente
-
 muestran alertas para comprobar funcionamiento.
-
 ============================================================
 */
 
 window.rh = {
 
-// ========================================================
-// VISTA PRINCIPAL DE RH
-// ========================================================
-"init-rh":function(){
-    router("rh");
-}
-    ,
-html: `
+    // ========================================================
+    // VISTA PRINCIPAL DE RH
+    // ========================================================
+    "init-rh": function () {
+        router("rh");
+    },
 
+    html: `
 <section class="container-fluid py-3" id="rrhh-dashboard">
 
     <!-- =========================================
@@ -360,97 +348,36 @@ html: `
 </section>
 `,
 
-//=====================
-    //init=============
-    //=================
-    "init-rh"(){
-    router("rh");
+    // ========================================================
+    // NUEVO USUARIO / EMPLEADO
+    // ========================================================
+    nuevoUsuario() {
+        alert("RH → Nuevo empleado");
+        console.log("[RH] nuevoUsuario()");
     },
 
     // ========================================================
-// NUEVO USUARIO / EMPLEADO
-// ========================================================
+    // EDITAR INFORMACIÓN DEL EMPLEADO
+    // ========================================================
+    editarUsuario(idUsuario = null) {
+        alert("RH → Editar empleado" + (idUsuario ? "\nID: " + idUsuario : ""));
+        console.log("[RH] editarUsuario()", idUsuario);
+    },
 
-nuevoUsuario() {
+    // ========================================================
+    // EDITAR ROLES
+    // ========================================================
+    editarRoles(idUsuario = null) {
+        alert("RH → Editar roles" + (idUsuario ? "\nID: " + idUsuario : ""));
+        console.log("[RH] editarRoles()", idUsuario);
+    },
 
-    alert(
-        "RH → Nuevo empleado"
-    );
-
-    console.log(
-        "[RH] nuevoUsuario()"
-    );
-
-},
-
-
-// ========================================================
-// EDITAR INFORMACIÓN DEL EMPLEADO
-// ========================================================
-
-editarUsuario(idUsuario = null) {
-
-    alert(
-        "RH → Editar empleado" +
-        (
-            idUsuario
-                ? "\nID: " + idUsuario
-                : ""
-        )
-    );
-
-    console.log(
-        "[RH] editarUsuario()",
-        idUsuario
-    );
-
-},
-
-
-// ========================================================
-// EDITAR ROLES
-// ========================================================
-
-editarRoles(idUsuario = null) {
-
-    alert(
-        "RH → Editar roles" +
-        (
-            idUsuario
-                ? "\nID: " + idUsuario
-                : ""
-        )
-    );
-
-    console.log(
-        "[RH] editarRoles()",
-        idUsuario
-    );
-
-},
-
-
-// ========================================================
-// CAMBIAR ESTADO
-// ========================================================
-
-cambiarEstado(idUsuario = null) {
-
-    alert(
-        "RH → Cambiar estado" +
-        (
-            idUsuario
-                ? "\nID: " + idUsuario
-                : ""
-        )
-    );
-
-    console.log(
-        "[RH] cambiarEstado()",
-        idUsuario
-    );
-
-}
-
+    // ========================================================
+    // CAMBIAR ESTADO
+    // ========================================================
+    cambiarEstado(idUsuario = null) {
+        alert("RH → Cambiar estado" + (idUsuario ? "\nID: " + idUsuario : ""));
+        console.log("[RH] cambiarEstado()", idUsuario);
+    }
 
 };
