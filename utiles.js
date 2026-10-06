@@ -182,41 +182,44 @@ window.inicio = {
 // =====================================================
 function cargarMenuRolesSecundarios(roles) {
   const menu = document.getElementById("menuRolesSecundarios");
-  if (!menu) return;
-
-  menu.innerHTML = "";
-
-  const rolPrincipal = roles?.principal ? String(roles.principal).toLowerCase().trim() : null;
   
-  const rolesSecundarios = Array.isArray(roles?.secundarios)
-    ? roles.secundarios
-    : [];
+  const rolPrincipal = roles?.principal ? String(roles.principal).toLowerCase().trim() : null;
+  const rolesSecundarios = Array.isArray(roles?.secundarios) ? roles.secundarios : [];
 
   const secundariosFiltrados = rolesSecundarios
     .map(rol => String(rol).toLowerCase().trim())
     .filter(rol => rol && rol !== rolPrincipal);
 
-  if (secundariosFiltrados.length > 0) {
+  // 1. Si existen roles secundarios, creamos los botones en el contenedor
+  if (secundariosFiltrados.length > 0 && menu) {
+    menu.innerHTML = "";
     const todosLosRoles = [rolPrincipal, ...secundariosFiltrados].filter(Boolean);
 
     todosLosRoles.forEach(rol => {
       const btn = document.createElement("button");
       btn.type = "button";
-      btn.className = "btn btn-primary w-100";
-      
+      btn.className = "btn btn-primary w-100 mb-2";
       btn.dataset.modulo = rol;
       btn.dataset.accion = `init-${rol}`;
-      btn.textContent = rol;
+      btn.textContent = rol.toUpperCase();
       
       menu.appendChild(btn);
     });
   }
 
-  if (rolPrincipal && window.rolPrincipal && typeof window.rolPrincipal[`init-${rolPrincipal}`] === "function") {
-    window.rolPrincipal[`init-${rolPrincipal}`]();
+  // 2. Ejecutar la función de inicialización del rol principal desde su módulo en window
+  if (rolPrincipal) {
+    const moduloObj = window[rolPrincipal]; // Accede dinámicamente a window.rh, window.admin, etc.
+    const accionInit = `init-${rolPrincipal}`;
+
+    if (moduloObj && typeof moduloObj[accionInit] === "function") {
+      console.log(`[LOGIN] Ejecutando ${rolPrincipal}.${accionInit}()`);
+      moduloObj[accionInit](); // Prepara el módulo y este llamará a router()
+    } else {
+      console.error(`[LOGIN] No se encontró el método window.${rolPrincipal}.${accionInit}`);
+    }
   }
 }
-
 // =====================================================
 // ARRANQUE
 // =====================================================
