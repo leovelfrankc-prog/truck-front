@@ -3,7 +3,7 @@
  */
 const Transporter = {
   // REEMPLAZAR CON TU SCRIPT ID DESPLEGADO COMO APLICACIÓN WEB
-  url: "https://script.google.com/macros/s/TU_SCRIPT_ID_AQUI/exec",
+  url: "https://script.google.com/macros/s/AKfycbx0WTI9ZLEC_ArJdkjYHplPSjXy3Xthc289eBaK894tC4ZREbrRaL_1IandKCaSYOZ85w/exec",
 
   async sendRequest(modulo, accion, payload = {}, options = {}) {
     const bodyData = {
