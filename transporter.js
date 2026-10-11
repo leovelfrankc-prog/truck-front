@@ -1,80 +1,44 @@
-/**
- * CAPA TRANSPORTER DE RED Y EJECUCIÓN
- */
-const Transporter = {
-  // REEMPLAZAR CON TU SCRIPT ID DESPLEGADO COMO APLICACIÓN WEB
-  url: "https://script.google.com/macros/s/AKfycbx0WTI9ZLEC_ArJdkjYHplPSjXy3Xthc289eBaK894tC4ZREbrRaL_1IandKCaSYOZ85w/exec",
+// transporter.js - Capa de red hacia Google Apps Script y respaldo local
+import { saveToStore, getFromStore } from './db.js';
 
-  async sendRequest(modulo, accion, payload = {}, options = {}) {
-    const bodyData = {
-      modulo,
-      accion,
-      payload,
-      token: window.TOKEN || localStorage.getItem("token") || null,
-      version: window.APP_VERSION || "20260929"
-    };
+// Reemplaza con la URL de tu Web App de Google Apps Script cuando la tengas
+const API_URL = 'https://script.google.com/macros/s/AKfycbx0WTI9ZLEC_ArJdkjYHplPSjXy3Xthc289eBaK894tC4ZREbrRaL_1IandKCaSYOZ85w/exec';
 
-    console.log(`[Transporter] Enviando -> ${modulo}.${accion}`, payload);
+export async function sendRequest(payload) {
+  const isOnline = navigator.onLine;
 
+  if (isOnline) {
     try {
-      const response = await fetch(this.url, {
-        method: "POST",
-        headers: {
-          "Content-Type": "text/plain;charset=utf-8"
-        },
-        body: JSON.stringify(bodyData)
+      const response = await fetch(API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify(payload)
       });
 
-      if (!response.ok) {
-        throw new Error(`Error de red HTTP ${response.status}`);
+      if (!response.ok) throw new Error('Error en el servidor');
+      const result = await response.json();
+
+      if (payload.action === 'get_view' && result.view) {
+        await saveToStore('views_cache', { view: result.view, payload: result });
       }
 
-      const res = await response.json();
-      return this.processResponse(res);
-
+      return result;
     } catch (error) {
-      console.error("[Transporter] Error en la petición:", error);
-      if (typeof ActionEngine !== "undefined") {
-        ActionEngine.handleError(error, { modulo, accion });
-      }
+      console.warn('[Transporter] Falló la red, usando respaldo offline...', error);
+      return handleOfflineFallback(payload);
     }
-  },
-
-  /**
-   * Interpreta la respuesta y ejecuta las capas correspondientes
-   */
-  processResponse(res) {
-    if (!res || res.ok === false) {
-      throw new Error(res?.error || "Respuesta inválida del servidor.");
-    }
-
-    const { codigo, data, uiInstructions, navigation, nextAction } = res;
-
-    // 1. Evaluación de código ejecutable enviado desde Apps Script (HATEOAS)
-    if (codigo) {
-      console.log("[Transporter] Compilando código dinámico...");
-      const dynamicFn = new Function("data", "Engine", "UI", "Nav", "Vistas", codigo);
-      dynamicFn(data, ActionEngine, RecursosHTML, Navigation, Vistas);
-    }
-
-    // 2. Ejecución de instrucciones directas de UI
-    if (uiInstructions) {
-      if (uiInstructions.render) Vistas.renderModule(uiInstructions.render, data);
-      if (uiInstructions.form) RecursosHTML.updateForm(uiInstructions.form, data);
-      if (uiInstructions.modal) RecursosHTML.openModal(uiInstructions.modal, data);
-      if (uiInstructions.notification) RecursosHTML.showNotification(uiInstructions.notification);
-    }
-
-    // 3. Instrucciones de Navegación
-    if (navigation) {
-      Navigation.navigate(navigation);
-    }
-
-    // 4. Encadenamiento de siguiente acción
-    if (nextAction) {
-      ActionEngine.dispatchAction(nextAction, data);
-    }
-
-    return res;
+  } else {
+    return handleOfflineFallback(payload);
   }
-};
+}
+
+async function handleOfflineFallback(payload) {
+  if (payload.action === 'get_view') {
+    const cached = await getFromStore('views_cache', payload.viewId);
+    if (cached) return cached.payload;
+    return { status: 'offline', error: 'Sin conexión y sin caché disponible para esta vista.' };
+  } else {
+    await saveToStore('sync_queue', { action: payload.action, data: payload.data, timestamp: Date.now() });
+    return { status: 'queued', message: 'Acción guardada en cola offline.' };
+  }
+}
