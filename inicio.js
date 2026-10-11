@@ -1,26 +1,22 @@
-// inicio.js - Arranque y gestión del flujo de instalación PWA
+// inicio.js - Prueba dedicada del flujo de instalación PWA
 import { openDB } from './db.js';
-import { cargarVistaMotor } from './engine.core.js';
 
-// Variable global para almacenar el evento de instalación
 let deferredPrompt = null;
 
 export async function inicio() {
-  console.log('[Motor] Inicializando PWA desde la raíz...');
+  console.log('[Motor] Inicializando PWA (Modo Prueba de Instalación)...');
 
-  // 1. Escuchar el evento que permite la instalación de la PWA
+  // 1. Escuchar el evento que permite la instalación nativa
   window.addEventListener('beforeinstallprompt', (e) => {
-    // Evitamos que el navegador muestre su barra nativa automática
     e.preventDefault();
-    // Guardamos el evento para dispararlo cuando el usuario haga clic en nuestro botón
     deferredPrompt = e;
     console.log('[PWA] Evento beforeinstallprompt capturado con éxito.');
-
-    // Opcional: Si detectamos que no está instalada, podemos mostrar una opción en la UI
+    
+    // Mostramos el botón de instalación en la interfaz
     mostrarBotonInstalacion();
   });
 
-  // 2. Registrar Service Worker
+  // 2. Registrar Service Worker minimalista
   if ('serviceWorker' in navigator) {
     try {
       const reg = await navigator.serviceWorker.register('./sw.js');
@@ -38,57 +34,58 @@ export async function inicio() {
     console.error('[DB] Error al inicializar IndexedDB:', err);
   }
 
-  // 4. Control de red
+  // 4. Control de red visual
   window.addEventListener('online', actualizarEstadoRed);
   window.addEventListener('offline', actualizarEstadoRed);
   actualizarEstadoRed();
 
-  // 5. Cargar vista inicial
-  await cargarVistaMotor({ action: 'get_view', viewId: 'home' });
+  // Quitamos cualquier llamada de fetch/red inicial para evitar errores 404
+  const container = document.getElementById('app-container');
+  container.innerHTML = `
+    <div class="card shadow-sm p-4 border-info">
+      <h3 class="text-info">Modo de Prueba: Instalación PWA</h3>
+      <p class="text-muted mb-0">Si tu navegador cumple con los requisitos (HTTPS, manifest, service worker), aparecerá el botón de instalación arriba o puedes verificar la compatibilidad.</p>
+    </div>
+  `;
 }
 
-// Renderiza una vista de instalación o un banner si la PWA es instalable
+// Renderiza el botón de instalación en la UI
 function mostrarBotonInstalacion() {
   const container = document.getElementById('app-container');
   
-  // Verificamos si ya existe el contenedor de instalación para no duplicarlo
   if (document.getElementById('install-card')) return;
 
   const installHTML = `
-    <div id="install-card" class="card shadow-sm p-4 mb-4 border-primary">
+    <div id="install-card" class="card shadow-sm p-4 mb-4 border-primary bg-light">
       <div class="d-flex justify-content-between align-items-center">
         <div>
-          <h4 class="text-primary mb-1">¡Instala nuestra PWA!</h4>
-          <p class="text-muted mb-0">Disfruta de una experiencia más rápida y acceso sin conexión directa desde tu pantalla de inicio.</p>
+          <h4 class="text-primary mb-1">🚀 ¡Instalar Aplicación!</h4>
+          <p class="text-muted mb-0">Haz clic en el botón para agregar esta PWA a tu dispositivo.</p>
         </div>
-        <button id="btn-instalar" class="btn btn-primary btn-lg px-4">Instalar</button>
+        <button id="btn-instalar" class="btn btn-primary btn-lg px-4 shadow">Instalar</button>
       </div>
     </div>
   `;
 
-  // Insertamos el banner al inicio del contenedor principal
   container.insertAdjacentHTML('afterbegin', installHTML);
 
-  // Asociamos el evento de clic al botón de instalación
   document.getElementById('btn-instalar').addEventListener('click', async () => {
     if (!deferredPrompt) {
-      alert('La aplicación ya está instalada o el navegador no permite la instalación automática.');
+      alert('El prompt de instalación no está disponible en este momento.');
       return;
     }
 
-    // Mostramos el banner nativo de instalación
+    // Disparamos el prompt nativo del navegador
     deferredPrompt.prompt();
 
-    // Esperamos la respuesta del usuario (si aceptó o rechazó)
     const { outcome } = await deferredPrompt.userChoice;
-    console.log(`[PWA] Resultado de la instalación: ${outcome}`);
+    console.log(`[PWA] Elección del usuario: ${outcome}`);
 
     if (outcome === 'accepted') {
-      console.log('[PWA] El usuario aceptó instalar la aplicación.');
+      console.log('[PWA] Instalación aceptada con éxito.');
       document.getElementById('install-card').remove();
     }
 
-    // Limpiamos la variable porque el prompt solo se puede usar una vez
     deferredPrompt = null;
   });
 }
