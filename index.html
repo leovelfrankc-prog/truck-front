@@ -18,6 +18,12 @@
       <div class="spinner-border text-primary" role="status"></div>
       <p class="text-muted mt-2">Cargando...</p>
     </div>
+    <!-- Contenedor del botón de instalación (oculto por defecto hasta que el navegador permita instalar) -->
+<div id="install-container" class="text-center my-4" style="display: none;">
+  <button id="btn-instalar-pwa" class="btn btn-success btn-lg shadow px-5 py-3 fw-bold">
+    📱 Instalar Aplicación
+  </button>
+</div>
   </main>
   <div id="modal-container"></div>
 
@@ -25,7 +31,7 @@
   
   <!-- El index solo llama a inicio() -->
 <script type="module">
-  import { inicio } from './inicio.js?v=20261011-01';
+  import { inicio } from './inicio.js?v=20261011-02';
   document.addEventListener('DOMContentLoaded', () => {
     inicio();
   });
