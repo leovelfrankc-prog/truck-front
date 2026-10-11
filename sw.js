@@ -3,7 +3,7 @@
  * Estrategia: Cache First para App Shell / Network Only para Google Apps Script
  */
 
-const CACHE_NAME = 'truckero-app-shell-v20260929';
+const CACHE_NAME = 'truckero-app-shell-v20260929.1';
 
 // Recursos locales indispensables que componen el App Shell estático
 const APP_SHELL_ASSETS = [
