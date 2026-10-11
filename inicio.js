@@ -1,96 +1,72 @@
-// inicio.js - Prueba dedicada del flujo de instalación PWA
-import { openDB } from './db.js';
-
+// Variable global para almacenar el evento de instalación
 let deferredPrompt = null;
 
 export async function inicio() {
-  console.log('[Motor] Inicializando PWA (Modo Prueba de Instalación)...');
+  console.log('[Motor] Inicializando control de instalación PWA...');
 
-  // 1. Escuchar el evento que permite la instalación nativa
+  const installContainer = document.getElementById('install-container');
+  const btnInstalar = document.getElementById('btn-instalar-pwa');
+
+  // 1. Capturar el evento cuando el navegador detecta que es instalable
   window.addEventListener('beforeinstallprompt', (e) => {
+    // Evitamos que aparezca el banner automático feo del navegador
     e.preventDefault();
+    // Guardamos el evento para dispararlo con nuestro botón personalizado
     deferredPrompt = e;
-    console.log('[PWA] Evento beforeinstallprompt capturado con éxito.');
     
-    // Mostramos el botón de instalación en la interfaz
-    mostrarBotonInstalacion();
+    console.log('[PWA] ¡La aplicación es instalable! Mostrando botón.');
+    // Mostramos nuestro botón personalizado en pantalla
+    if (installContainer) {
+      installContainer.style.display = 'block';
+    }
   });
 
-  // 2. Registrar Service Worker minimalista
-  if ('serviceWorker' in navigator) {
-    try {
-      const reg = await navigator.serviceWorker.register('./sw.js');
-      console.log('[SW] Service Worker registrado:', reg.scope);
-    } catch (err) {
-      console.error('[SW] Error al registrar Service Worker:', err);
-    }
+  // 2. Programar la acción al hacer clic en nuestro botón
+  if (btnInstalar) {
+    btnInstalar.addEventListener('click', async () => {
+      if (!deferredPrompt) {
+        alert('El asistente de instalación no está disponible. Es posible que la app ya esté instalada o que el navegador no lo permita en esta sesión.');
+        return;
+      }
+
+      // Disparamos el prompt nativo de instalación requerido por el navegador
+      deferredPrompt.prompt();
+
+      // Esperamos la respuesta del usuario
+      const { outcome } = await deferredPrompt.userChoice;
+      console.log(`[PWA] Respuesta del usuario a la instalación: ${outcome}`);
+
+      if (outcome === 'accepted') {
+        console.log('[PWA] Usuario aceptó la instalación.');
+        // Ocultamos el botón una vez instalada
+        if (installContainer) {
+          installContainer.style.display = 'none';
+        }
+      } else {
+        console.log('[PWA] Usuario canceló la instalación.');
+      }
+
+      // El prompt solo se puede usar una vez, lo limpiamos
+      deferredPrompt = null;
+    });
   }
 
-  // 3. Inicializar IndexedDB
-  try {
-    await openDB();
-    console.log('[DB] IndexedDB inicializada.');
-  } catch (err) {
-    console.error('[DB] Error al inicializar IndexedDB:', err);
-  }
-
-  // 4. Control de red visual
-  window.addEventListener('online', actualizarEstadoRed);
-  window.addEventListener('offline', actualizarEstadoRed);
-  actualizarEstadoRed();
-
-  // Quitamos cualquier llamada de fetch/red inicial para evitar errores 404
-  const container = document.getElementById('app-container');
-  container.innerHTML = `
-    <div class="card shadow-sm p-4 border-info">
-      <h3 class="text-info">Modo de Prueba: Instalación PWA</h3>
-      <p class="text-muted mb-0">Si tu navegador cumple con los requisitos (HTTPS, manifest, service worker), aparecerá el botón de instalación arriba o puedes verificar la compatibilidad.</p>
-    </div>
-  `;
-}
-
-// Renderiza el botón de instalación en la UI
-function mostrarBotonInstalacion() {
-  const container = document.getElementById('app-container');
-  
-  if (document.getElementById('install-card')) return;
-
-  const installHTML = `
-    <div id="install-card" class="card shadow-sm p-4 mb-4 border-primary bg-light">
-      <div class="d-flex justify-content-between align-items-center">
-        <div>
-          <h4 class="text-primary mb-1">🚀 ¡Instalar Aplicación!</h4>
-          <p class="text-muted mb-0">Haz clic en el botón para agregar esta PWA a tu dispositivo.</p>
-        </div>
-        <button id="btn-instalar" class="btn btn-primary btn-lg px-4 shadow">Instalar</button>
-      </div>
-    </div>
-  `;
-
-  container.insertAdjacentHTML('afterbegin', installHTML);
-
-  document.getElementById('btn-instalar').addEventListener('click', async () => {
-    if (!deferredPrompt) {
-      alert('El prompt de instalación no está disponible en este momento.');
-      return;
+  // 3. Detectar si la app ya fue instalada previamente
+  window.addEventListener('appinstalled', () => {
+    console.log('[PWA] La aplicación se instaló exitosamente.');
+    if (installContainer) {
+      installContainer.style.display = 'none';
     }
-
-    // Disparamos el prompt nativo del navegador
-    deferredPrompt.prompt();
-
-    const { outcome } = await deferredPrompt.userChoice;
-    console.log(`[PWA] Elección del usuario: ${outcome}`);
-
-    if (outcome === 'accepted') {
-      console.log('[PWA] Instalación aceptada con éxito.');
-      document.getElementById('install-card').remove();
-    }
-
     deferredPrompt = null;
   });
-}
 
-function actualizarEstadoRed() {
-  const indicador = document.getElementById('offline-indicator');
-  indicador.style.display = navigator.onLine ? 'none' : 'block';
+  // Registro básico del Service Worker
+  if ('serviceWorker' in navigator) {
+    try {
+      await navigator.serviceWorker.register('./sw.js');
+      console.log('[SW] Service Worker registrado correctamente.');
+    } catch (err) {
+      console.error('[SW] Error al registrar:', err);
+    }
+  }
 }
