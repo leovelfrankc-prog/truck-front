@@ -132,18 +132,15 @@
 
   <!-- Motor + Aplicación -->
   <script type="module">
-   import { crearMotor } from '../motor/registro.js';
+import { crearMotor } from './core/Motor.js';
 
-/**
- * Punto de entrada de la aplicación
- */
-export async function inicio() {
-  console.log('Iniciando aplicación (modo prueba)...');
-
-  // 1. Crear el motor
+document.addEventListener('DOMContentLoaded', () => {
+  // 1. Creamos el motor y lo asignamos a window para acceso global
   window.motor = crearMotor('view-content');
-  window.motor.inicio();
 
+  // 2. Ejecutamos el inicio directamente desde el motor global
+  window.motor.inicio();
+});
   </script>
 
 </body>
