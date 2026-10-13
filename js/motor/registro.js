@@ -3,7 +3,7 @@
  * Aquí se importan y registran todos los componentes disponibles.
  */
 
-import { Motor } from './Motor.js';
+import { Motor } from '../Motor.js';
 
 // Importamos todos los componentes
 import { Texto } from '../componentes/Texto.js';
