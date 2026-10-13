@@ -160,4 +160,38 @@ export class Motor {
       this.renderizar(vistaLogin);
     }
   }
+  /**
+ * Guarda el token en localStorage
+ * @param {string} token - Token a guardar
+ */
+setToken(token) {
+  if (token === null || token === undefined) {
+    localStorage.removeItem('truckero_token');
+    return;
+  }
+  localStorage.setItem('truckero_token', token);
+}
+
+/**
+ * Recupera el token desde localStorage
+ * @returns {string|null} El token o null si no existe
+ */
+getToken() {
+  return localStorage.getItem('truckero_token');
+}
+
+/**
+ * Elimina el token del localStorage (útil para logout)
+ */
+removeToken() {
+  localStorage.removeItem('truckero_token');
+}
+
+/**
+ * Verifica si existe un token guardado
+ * @returns {boolean}
+ */
+hasToken() {
+  return !!this.getToken();
+}
 }
