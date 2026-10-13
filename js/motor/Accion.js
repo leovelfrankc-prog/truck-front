@@ -50,6 +50,7 @@ export class Accion {
     // Esta lógica se completará cuando implementemos la instalación PWA
     // Por ahora solo dejamos el punto de extensión
     console.log('Acción: install', contexto);
+    alert("pincha instalar");
 
     // Ejemplo de cómo se llamará más adelante:
     // import { manejarInstalacion } from '../utilidades/instalacion.js';
