@@ -1,4 +1,37 @@
 import { Accion } from './Accion.js';
+const vistaInstalar({
+    title: 'Instalar Truckero',
+    components: [
+      {
+        type: 'alert',
+        variant: 'info',
+        content: 'Para disfrutar de la mejor experiencia y acceso sin conexión, instala Truckero en tu dispositivo.'
+      },
+      {
+        type: 'button',
+        id: 'btn-instalar-pwa',
+        text: 'Instalar aplicación ahora',
+        variant: 'primary',
+        actions: [
+          {
+            type: 'install' // Esto disparará la acción de instalación en tu clase Accion
+          }
+        ]
+      }
+    ]
+  });
+  const vistaLogin({
+    title: 'Iniciar sesión - Truckero',
+    components: [
+      {
+        type: 'text',
+        content: 'Bienvenido de nuevo. Por favor, inicia sesión para continuar.'
+      }
+      // Aquí puedes agregar tus componentes de formulario de login en el futuro
+    ]
+  });
+
+
 
 /**
  * Motor genérico que interpreta y renderiza orientaciones JSON
@@ -110,4 +143,26 @@ export class Motor {
     const accion = new Accion(configAccion, this);
     accion.ejecutar(contexto);
   }
+  import { crearMotor } from '../core/Motor.js'; // Ajusta la ruta según tu estructura de carpetas
+
+/**
+ * Función principal de inicio de la aplicación
+ */
+inicio() {
+  const estaInstalada = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+
+  console.log(`Estado PWA - Standalone: ${estaInstalada}`);
+
+  // 3. Bifurcación según el estado de instalación
+  if (!estaInstalada) {
+    // Si NO está instalada, llamamos a la función/módulo de instalación
+    this.renderizar(vistaInstalar);
+  } else {
+    // Si SÍ está instalada, pasamos al flujo de inicio de sesión / aplicación
+    this.renderizar(vistaLogin);
+  }
 }
+
+
+
+  }
