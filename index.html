@@ -128,13 +128,22 @@
   </script>
 
   <!-- Motor + Aplicación -->
-  <script type="module">
-    import { crearMotor } from './js/motor/registro.js';
+<script type="module">
+  import { crearMotor } from './js/motor/registro.js';
 
-    document.addEventListener('DOMContentLoaded', () => {
-      window.motor = crearMotor('view-content');
-      window.motor.inicio();
-    });
-  </script>
+  document.addEventListener('DOMContentLoaded', () => {
+    // 1. Inicializamos el motor globalmente
+    window.motor = crearMotor('view-content');
+
+    // 2. Si el motor ya tiene un token guardado, puedes opcionalmente loguearlo o validarlo aquí
+    if (window.motor.hasToken()) {
+      window.TOKEN=window.motor.getToken();
+      console.log('Token detectado en el almacenamiento local.');
+    }
+
+    // 3. Arrancamos el ciclo de vida de la aplicación
+    window.motor.inicio();
+  });
+</script>
 </body>
 </html>
