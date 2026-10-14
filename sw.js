@@ -1,5 +1,5 @@
 // sw.js - Service Worker minimalista
-const CACHE_NAME = 'desarrollando-1';
+const CACHE_NAME = 'desarrollando-2';
 
 // Solo cacheamos la vista estática base para offline básico
 const ASSETS_TO_CACHE = [
