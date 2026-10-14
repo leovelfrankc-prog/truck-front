@@ -167,6 +167,7 @@ export class Motor {
           payload: null
         }
       });
+      console.log("DEBUG - window.TOKEN actual:", window.TOKEN);
     } catch (error) {
       console.error('Error al cargar la vista de inicio:', error);
       // Fallback
