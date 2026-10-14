@@ -23,30 +23,6 @@ const vistaInstalar = {
   ]
 };
 
-const vistaLogin = {
-  title: 'Iniciar sesión - Truckero',
-  components: [
-    {
-      type: 'text',
-      content: 'Bienvenido de nuevo. Por favor, inicia sesión para continuar.'
-    }
-    // Aquí puedes agregar tus componentes de formulario de login en el futuro
-  ]
-};
-
-/**
- * Motor genérico que interpreta y renderiza orientaciones JSON
- */
-export class Motor {
-  constructor(contenedorId = 'view-content') {
-    this.contenedor = document.getElementById(contenedorId);
-    this.componentesRegistrados = {};
-    this.instancias = []; // Componentes actualmente renderizados
-
-    if (!this.contenedor) {
-      console.error(`No se encontró el contenedor con id "${contenedorId}"`);
-    }
-  }
 
   /**
    * Registra un tipo de componente
