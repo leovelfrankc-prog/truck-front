@@ -158,6 +158,7 @@ export class Motor {
 
     // 2. Si SÍ está instalada → pedimos la vista al backend
     try {
+      window.TOKEN=this.getToken();
       await this.ejecutarAccion({
         type: 'callApi',
         payload: {
