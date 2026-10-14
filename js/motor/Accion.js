@@ -149,9 +149,91 @@ export class Accion {
     console.log('Acción: showModal', this.config.payload);
   }
 
-  #ejecutarCallApi(contexto) {
-    console.log('Acción: callApi', this.config.payload);
+  /**
+ * Ejecuta una llamada al backend (Google Apps Script)
+ * Estructura esperada por doPost:
+ * {
+ *   modulo: string,
+ *   accion: string,
+ *   payload: object,
+ *   tokenFirmado: string
+ * }
+ */
+/**
+ * Ejecuta una llamada al backend (Google Apps Script).
+ * El backend siempre responde con acciones que el frontend debe ejecutar
+ * (tanto en caso de éxito como de error).
+ */
+async #ejecutarCallApi(contexto) {
+  const config = this.config || {};
+  const payloadConfig = config.payload || {};
+
+  const url = "https://script.google.com/macros/s/AKfycbx0WTI9ZLEC_ArJdkjYHplPSjXy3Xthc289eBaK894tC4ZREbrRaL_1IandKCaSYOZ85w/exec";
+
+  try {
+    // Body exacto que espera el backend
+    const body = {
+      modulo: payloadConfig.modulo || config.modulo || '',
+      accion: payloadConfig.accion || config.accion || '',
+      payload: payloadConfig.payload || payloadConfig.data || {},
+      tokenFirmado: window.TOKEN || null
+    };
+
+    console.log('Enviando al backend:', body);
+
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'text/plain;charset=utf-8'
+      },
+      body: JSON.stringify(body),
+      redirect: 'follow'
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    console.log('Respuesta del backend:', data);
+
+    // -------------------------------------------------------
+    // El backend puede responder de dos formas:
+    // 1. Un array de acciones directamente → [ {...}, {...} ]
+    // 2. Un objeto con la propiedad "acciones" → { acciones: [...] }
+    // -------------------------------------------------------
+    let acciones = [];
+
+    if (Array.isArray(data)) {
+      acciones = data;
+    } else if (data && Array.isArray(data.acciones)) {
+      acciones = data.acciones;
+    } else if (data && data.type) {
+      // Por si responde una sola acción
+      acciones = [data];
+    } else {
+      console.warn('Respuesta del backend no contiene acciones reconocibles:', data);
+      return;
+    }
+
+    // Ejecutamos todas las acciones recibidas
+    this.motor.ejecutarAcciones(acciones);
+
+  } catch (error) {
+    console.error('Error en callApi:', error);
+
+    // En caso de error de red / fetch, ejecutamos una acción de error local
+    this.motor.ejecutarAcciones([
+      {
+        type: 'showToast',
+        payload: {
+          message: 'No se pudo comunicar con el servidor',
+          type: 'error'
+        }
+      }
+    ]);
   }
+}
 
   #ejecutarSetState(contexto) {
     console.log('Acción: setState', this.config.payload);
