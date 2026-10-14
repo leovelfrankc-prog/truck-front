@@ -1,6 +1,6 @@
 import { Accion } from './Accion.js';
 
-// Definición correcta de las vistas (como objetos literales)
+// ====================== VISTAS ======================
 const vistaInstalar = {
   title: 'Instalar Truckero',
   components: [
@@ -16,18 +16,37 @@ const vistaInstalar = {
       variant: 'primary',
       actions: [
         {
-          type: 'install' // Esto disparará la acción de instalación en tu clase Accion
+          type: 'install'
         }
       ]
     }
   ]
 };
 
+const vistaLogin = {
+  title: 'Iniciar sesión - Truckero',
+  components: [
+    {
+      type: 'text',
+      content: 'Bienvenido de nuevo. Por favor, inicia sesión para continuar.'
+    }
+  ]
+};
+
+// ====================== CLASE MOTOR ======================
+export class Motor {
+  constructor(contenedorId = 'view-content') {
+    this.contenedor = document.getElementById(contenedorId);
+    this.componentesRegistrados = {};
+    this.instancias = [];
+
+    if (!this.contenedor) {
+      console.error(`No se encontró el contenedor con id "${contenedorId}"`);
+    }
+  }
 
   /**
    * Registra un tipo de componente
-   * @param {string} tipo - Nombre del tipo (ej: "button", "text")
-   * @param {class} ClaseComponente - Clase que hereda de Componente
    */
   registrar(tipo, ClaseComponente) {
     this.componentesRegistrados[tipo] = ClaseComponente;
@@ -35,23 +54,18 @@ const vistaInstalar = {
 
   /**
    * Renderiza una orientación completa
-   * @param {Object} orientacion - Objeto JSON de orientación
    */
   renderizar(orientacion = {}) {
     this.limpiar();
 
-    // Actualizar título de la página si viene
     if (orientacion.title) {
       document.title = orientacion.title;
-
-      // Opcional: actualizar también el título del header
       const tituloHeader = document.getElementById('app-title');
       if (tituloHeader) {
         tituloHeader.textContent = orientacion.title;
       }
     }
 
-    // Renderizar componentes
     const componentes = orientacion.components || [];
     componentes.forEach((config) => {
       const instancia = this.crearComponente(config);
@@ -63,14 +77,13 @@ const vistaInstalar = {
       }
     });
 
-    // Ejecutar acciones onLoad
     if (orientacion.onLoad && Array.isArray(orientacion.onLoad)) {
       this.ejecutarAcciones(orientacion.onLoad);
     }
   }
 
   /**
-   * Crea una instancia de componente a partir de su configuración
+   * Crea una instancia de componente
    */
   crearComponente(config) {
     if (!config || !config.type) {
@@ -79,7 +92,6 @@ const vistaInstalar = {
     }
 
     const Clase = this.componentesRegistrados[config.type];
-
     if (!Clase) {
       console.warn(`Componente no registrado: "${config.type}"`);
       return null;
@@ -105,11 +117,18 @@ const vistaInstalar = {
   }
 
   /**
-   * Ejecuta una lista de acciones
+   * Ejecuta una o varias acciones.
+   * Acepta tanto un array de acciones como una sola acción.
    */
   ejecutarAcciones(acciones = []) {
-    acciones.forEach((configAccion) => {
-      this.ejecutarAccion(configAccion);
+    const lista = Array.isArray(acciones) ? acciones : [acciones];
+
+    lista.forEach((configAccion) => {
+      if (configAccion && typeof configAccion === 'object') {
+        this.ejecutarAccion(configAccion);
+      } else {
+        console.warn('Acción inválida recibida:', configAccion);
+      }
     });
   }
 
@@ -124,50 +143,58 @@ const vistaInstalar = {
   /**
    * Método principal de inicio de la aplicación
    */
-  inicio() {
-    const estaInstalada = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
-
-    console.log(`Estado PWA - Standalone: ${estaInstalada}`);
-
-    // Bifurcación según el estado de instalación
-    if (!estaInstalada) {
-      this.renderizar(vistaInstalar);
-    } else {
-      this.renderizar(vistaLogin);
-    }
-  }
-  /**
- * Guarda el token en localStorage
- * @param {string} token - Token a guardar
+/**
+ * Método principal de inicio de la aplicación
  */
-setToken(token) {
-  if (token === null || token === undefined) {
-    localStorage.removeItem('truckero_token');
+async inicio() {
+  const estaInstalada =
+    window.matchMedia('(display-mode: standalone)').matches ||
+    window.navigator.standalone === true;
+
+  console.log(`Estado PWA - Standalone: ${estaInstalada}`);
+
+  // 1. Si NO está instalada → mostramos la vista local de instalación
+  if (!estaInstalada) {
+    this.renderizar(vistaInstalar);
     return;
   }
-  localStorage.setItem('truckero_token', token);
-}
 
-/**
- * Recupera el token desde localStorage
- * @returns {string|null} El token o null si no existe
- */
-getToken() {
-  return localStorage.getItem('truckero_token');
-}
+  // 2. Si SÍ está instalada → pedimos la vista al backend
+  try {
+    await this.ejecutarAccion({
+      type: 'callApi',
+      payload: {
+        modulo: 'inicio',
+        accion: 'cargarVista',
+        payload: null
+      }
+    });
+  } catch (error) {
+    console.error('Error al cargar la vista de inicio:', error);
 
-/**
- * Elimina el token del localStorage (útil para logout)
- */
-removeToken() {
-  localStorage.removeItem('truckero_token');
+    // Fallback por si falla la comunicación
+    this.renderizar(vistaLogin);
+  }
 }
+  // ====================== TOKEN ======================
 
-/**
- * Verifica si existe un token guardado
- * @returns {boolean}
- */
-hasToken() {
-  return !!this.getToken();
-}
+  setToken(token) {
+    if (token === null || token === undefined) {
+      localStorage.removeItem('truckero_token');
+      return;
+    }
+    localStorage.setItem('truckero_token', token);
+  }
+
+  getToken() {
+    return localStorage.getItem('truckero_token');
+  }
+
+  removeToken() {
+    localStorage.removeItem('truckero_token');
+  }
+
+  hasToken() {
+    return !!this.getToken();
+  }
 }
