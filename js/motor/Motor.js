@@ -137,45 +137,41 @@ export class Motor {
    */
   ejecutarAccion(configAccion, contexto = {}) {
     const accion = new Accion(configAccion, this);
-    accion.ejecutar(contexto);
+    return accion.ejecutar(contexto); // ← importante: devolvemos la promesa
   }
 
   /**
    * Método principal de inicio de la aplicación
    */
-/**
- * Método principal de inicio de la aplicación
- */
-async inicio() {
-  const estaInstalada =
-    window.matchMedia('(display-mode: standalone)').matches ||
-    window.navigator.standalone === true;
+  async inicio() {
+    const estaInstalada =
+      window.matchMedia('(display-mode: standalone)').matches ||
+      window.navigator.standalone === true;
 
-  console.log(`Estado PWA - Standalone: ${estaInstalada}`);
+    console.log(`Estado PWA - Standalone: ${estaInstalada}`);
 
-  // 1. Si NO está instalada → mostramos la vista local de instalación
-  if (!estaInstalada) {
-    this.renderizar(vistaInstalar);
-    return;
+    // 1. Si NO está instalada → vista local de instalación
+    if (!estaInstalada) {
+      this.renderizar(vistaInstalar);
+      return;
+    }
+
+    // 2. Si SÍ está instalada → pedimos la vista al backend
+    try {
+      await this.ejecutarAccion({
+        type: 'callApi',
+        payload: {
+          modulo: 'inicio',
+          accion: 'cargarVista',
+          payload: null
+        }
+      });
+    } catch (error) {
+      console.error('Error al cargar la vista de inicio:', error);
+      // Fallback
+      this.renderizar(vistaLogin);
+    }
   }
-
-  // 2. Si SÍ está instalada → pedimos la vista al backend
-  try {
-    await this.ejecutarAccion({
-      type: 'callApi',
-      payload: {
-        modulo: 'inicio',
-        accion: 'cargarVista',
-        payload: null
-      }
-    });
-  } catch (error) {
-    console.error('Error al cargar la vista de inicio:', error);
-
-    // Fallback por si falla la comunicación
-    this.renderizar(vistaLogin);
-  }
-}
   // ====================== TOKEN ======================
 
   setToken(token) {
