@@ -143,6 +143,7 @@ export class Accion {
     const mensaje = this.config.payload?.message || 'Mensaje';
     const tipo = this.config.payload?.type || 'info';
     console.log(`Toast [${tipo}]: ${mensaje}`);
+    alert(`Toast [${tipo}]: ${mensaje}`);
   }
 
   #ejecutarShowModal(contexto) {
