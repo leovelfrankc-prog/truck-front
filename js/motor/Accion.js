@@ -137,6 +137,7 @@ export class Accion {
 
   #ejecutarNavegar(contexto) {
     console.log('Acción: navigate', this.config.payload);
+    this.motor.renderizar(this.config.payload);
   }
 
   #ejecutarShowToast(contexto) {
