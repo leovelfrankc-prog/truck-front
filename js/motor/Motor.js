@@ -150,13 +150,9 @@ export class Motor {
 
     console.log(`Estado PWA - Standalone: ${estaInstalada}`);
 
-    // 1. Si NO está instalada → vista local de instalación
-    if (!estaInstalada) {
-      this.renderizar(vistaInstalar);
-      return;
-    }
 
-    // 2. Si SÍ está instalada → pedimos la vista al backend
+
+    
     try {
       
       await this.ejecutarAccion({
@@ -164,7 +160,7 @@ export class Motor {
         payload: {
           modulo: 'inicio',
           accion: 'cargarVista',
-          payload: null
+          payload: estaInstalada
         }
       });
       console.log("DEBUG - window.TOKEN actual:", window.TOKEN);
