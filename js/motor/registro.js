@@ -11,6 +11,8 @@ import { Boton } from '../componentes/Boton.js';
 import { Card } from '../componentes/Card.js';
 import { Contenedor } from '../componentes/Contenedor.js';
 import { Alerta } from '../componentes/Alerta.js';
+import { Imput } from '../componentes/input.js';
+import { Formulario } from '../componentes/formulario.js';
 
 /**
  * Crea una instancia del motor y registra los componentes disponibles.
@@ -26,6 +28,8 @@ export function crearMotor(contenedorId = 'view-content') {
   motor.registrar('card', Card);
   motor.registrar('container', Contenedor);
   motor.registrar('alert', Alerta);
+  motor.registrar('input', Input);
+  motor.registrar('formulario', Formulario);
 
   return motor;
 }
