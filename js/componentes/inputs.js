@@ -1,5 +1,6 @@
 import { Componente } from '../motor/Componente.js';
 
+
 export class Input extends Componente {
   render() {
     this.elemento = document.createElement('div');
