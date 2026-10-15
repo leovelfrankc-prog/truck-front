@@ -3,3 +3,5 @@ export { Boton } from './Boton.js';
 export { Card } from './Card.js';
 export { Contenedor } from './Contenedor.js';
 export { Alerta } from './Alerta.js';
+export { Input } from './input.js';
+export { Formulario } from './formulario.js';
