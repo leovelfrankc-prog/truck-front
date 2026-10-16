@@ -48,64 +48,61 @@ export class Accion {
    *  - Muestra una alerta con el token
    */
   async #ejecutarInstalar(contexto) {
-    // 1. Si todavía no hemos capturado el evento, lo intentamos capturar ahora
-    //    (aunque lo ideal es capturarlo lo más temprano posible)
-    if (!window.__truckeroDeferredPrompt) {
-      // Intentamos escuchar por si aún no se ha disparado
-      const capturePrompt = (e) => {
-        e.preventDefault();
-        window.__truckeroDeferredPrompt = e;
-      };
-      window.addEventListener('beforeinstallprompt', capturePrompt, { once: true });
-    }
+  const deferredPrompt = window.__truckeroDeferredPrompt;
 
-    const deferredPrompt = window.__truckeroDeferredPrompt;
-
-    // 2. Si no hay prompt disponible → mostramos instrucciones manuales
-    if (!deferredPrompt) {
-      this.#mostrarMensajeInstalacionManual();
-      return;
-    }
-
-    try {
-      // 3. Mostramos el diálogo nativo de instalación
-      deferredPrompt.prompt();
-
-      // 4. Esperamos la decisión del usuario
-      const { outcome } = await deferredPrompt.userChoice;
-
-      if (outcome === 'accepted') {
-        console.log('Usuario aceptó instalar la aplicación');
-
-        // 5. Obtenemos el token de la URL
-        const params = new URLSearchParams(window.location.search);
-        const token = params.get('token');
-
-        if (token) {
-          // 6. Guardamos el token usando el motor
-          this.motor.setToken(token);
-
-          // 7. Mostramos la alerta con el token
-          alert(`Token guardado correctamente:\n\n${token}`);
-
-          // 8. Limpiamos el token de la barra de direcciones
-          const nuevaUrl = window.location.origin + window.location.pathname;
-          window.history.replaceState({}, document.title, nuevaUrl);
-        } else {
-          alert('Aplicación instalada, pero no se encontró el token en la URL');
-        }
-      } else {
-        console.log('Usuario rechazó la instalación');
-      }
-    } catch (error) {
-      console.error('Error al intentar instalar la PWA:', error);
-      alert('No se pudo mostrar el diálogo de instalación');
-    } finally {
-      // Limpiamos el prompt para que no se pueda usar de nuevo
-      window.__truckeroDeferredPrompt = null;
-    }
+  // -------------------------------------------------
+  // 1. Si no hay prompt nativo → instrucciones manuales
+  // -------------------------------------------------
+  if (!deferredPrompt) {
+    this.#mostrarMensajeInstalacionManual();
+    return;
   }
 
+  try {
+    // 2. Mostrar el diálogo nativo de instalación
+    deferredPrompt.prompt();
+
+    // 3. Esperar la decisión del usuario
+    const { outcome } = await deferredPrompt.userChoice;
+
+    if (outcome === 'accepted') {
+      console.log('[PWA] Usuario aceptó instalar la aplicación');
+
+      // 4. Guardar token si viene en la URL
+      const params = new URLSearchParams(window.location.search);
+      const token = params.get('token');
+
+      if (token) {
+        this.motor.setToken(token);
+        console.log('[PWA] Token guardado correctamente');
+      }
+
+      // 5. Limpiar el token de la URL
+      const nuevaUrl = window.location.origin + window.location.pathname;
+      window.history.replaceState({}, document.title, nuevaUrl);
+
+      // 6. Llamar a la API para cargar la vista como instalada
+      await this.ejecutar({
+        type: 'callApi',
+        payload: {
+          modulo: 'inicio',
+          accion: 'cargarVista',
+          payload: true          // estaInstalada = true
+        }
+      });
+
+    } else {
+      console.log('[PWA] Usuario rechazó la instalación');
+    }
+
+  } catch (error) {
+    console.error('[PWA] Error al intentar instalar:', error);
+    this.#mostrarMensajeInstalacionManual();
+  } finally {
+    // El prompt solo se puede usar una vez
+    window.__truckeroDeferredPrompt = null;
+  }
+}
   /**
    * Mensaje de ayuda cuando no se puede usar el diálogo nativo
    * (iOS, navegadores antiguos, o cuando ya está instalada)
