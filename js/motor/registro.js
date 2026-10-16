@@ -11,7 +11,7 @@ import { Boton } from '../componentes/Boton.js';
 import { Card } from '../componentes/Card.js';
 import { Contenedor } from '../componentes/Contenedor.js';
 import { Alerta } from '../componentes/Alerta.js';
-import { Input } from '../componentes/input.js';
+import { Input } from '../componentes/inputs.js';
 import { Formulario } from '../componentes/formulario.js';
 
 /**
