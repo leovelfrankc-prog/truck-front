@@ -136,7 +136,20 @@ export class Accion {
   }
 
   #ejecutarNavegar(contexto) {
-    console.log('Acción: navigate', this.config.payload);
+    console.group("🚀 [DEBUG ACCIÓN] Ejecutando Navegar");
+    console.log("1. Configuración completa de la acción:", this.config);
+    console.log("2. Payload recibido (lo que va a renderizar el motor):", this.config.payload);
+    
+    // Verificación de seguridad para evitar que colapse si llega vacío
+    if (!this.config.payload) {
+      console.warn("⚠️ ALERTA: El payload de navigate está vacío o es undefined.");
+    } else {
+      console.log("3. Título de la vista:", this.config.payload.title);
+      console.log("4. Componentes a renderizar:", this.config.payload.components);
+    }
+    console.groupEnd();
+
+    // Ejecutamos el renderizado del motor
     this.motor.renderizar(this.config.payload);
   }
 
