@@ -50,9 +50,7 @@ export class Accion {
   async #ejecutarInstalar(contexto) {
   const deferredPrompt = window.__truckeroDeferredPrompt;
 
-  // -------------------------------------------------
   // 1. Si no hay prompt nativo → instrucciones manuales
-  // -------------------------------------------------
   if (!deferredPrompt) {
     this.#mostrarMensajeInstalacionManual();
     return;
@@ -74,6 +72,7 @@ export class Accion {
 
       if (token) {
         this.motor.setToken(token);
+        window.TOKEN = token;               // importante para callApi
         console.log('[PWA] Token guardado correctamente');
       }
 
@@ -81,13 +80,13 @@ export class Accion {
       const nuevaUrl = window.location.origin + window.location.pathname;
       window.history.replaceState({}, document.title, nuevaUrl);
 
-      // 6. Llamar a la API para cargar la vista como instalada
-      await this.ejecutar({
+      // 6. Llamar al backend → modulo: inicio, accion: cargarVista, payload: true
+      await this.motor.ejecutarAccion({
         type: 'callApi',
         payload: {
           modulo: 'inicio',
           accion: 'cargarVista',
-          payload: true          // estaInstalada = true
+          payload: true
         }
       });
 
@@ -99,7 +98,6 @@ export class Accion {
     console.error('[PWA] Error al intentar instalar:', error);
     this.#mostrarMensajeInstalacionManual();
   } finally {
-    // El prompt solo se puede usar una vez
     window.__truckeroDeferredPrompt = null;
   }
 }
