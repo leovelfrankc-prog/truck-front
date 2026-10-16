@@ -1,37 +1,5 @@
 import { Accion } from './Accion.js';
 
-// ====================== VISTAS ======================
-const vistaInstalar = {
-  title: 'Instalar Truckero',
-  components: [
-    {
-      type: 'alert',
-      variant: 'info',
-      content: 'Para disfrutar de la mejor experiencia y acceso sin conexión, instala Truckero en tu dispositivo.'
-    },
-    {
-      type: 'button',
-      id: 'btn-instalar-pwa',
-      text: 'Instalar aplicación ahora',
-      variant: 'primary',
-      actions: [
-        {
-          type: 'install'
-        }
-      ]
-    }
-  ]
-};
-
-const vistaLogin = {
-  title: 'Iniciar sesión - Truckero',
-  components: [
-    {
-      type: 'text',
-      content: 'Bienvenido de nuevo. Por favor, inicia sesión para continuar.'
-    }
-  ]
-};
 
 // ====================== CLASE MOTOR ======================
 export class Motor {
