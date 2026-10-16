@@ -135,7 +135,7 @@ export class Motor {
     } catch (error) {
       console.error('Error al cargar la vista de inicio:', error);
       // Fallback
-      this.renderizar(vistaLogin);
+      
     }
   }
   // ====================== TOKEN ======================
