@@ -150,7 +150,13 @@ export class Accion {
     console.groupEnd();
 
     // Ejecutamos el renderizado del motor
-    this.motor.renderizar(this.config.payload);
+     this.motor.renderizar(this.config.payload);
+    this.ejecutar({
+      type:"callApi",
+      payload:{
+        modulo:"inicio",
+        accion:"cargarVista",
+        payload:"True"}})
   }
 
   #ejecutarShowToast(contexto) {
