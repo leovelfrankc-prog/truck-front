@@ -1,11 +1,8 @@
 import { Accion } from './Accion.js';
 
-
-// ====================== CLASE MOTOR ======================
 export class Motor {
   constructor(contenedorId = 'view-content') {
     this.contenedor = document.getElementById(contenedorId);
-    this.componentesRegistrados = {};
     this.instancias = [];
 
     if (!this.contenedor) {
@@ -13,64 +10,20 @@ export class Motor {
     }
   }
 
-  /**
-   * Registra un tipo de componente
-   */
-  registrar(tipo, ClaseComponente) {
-    this.componentesRegistrados[tipo] = ClaseComponente;
-  }
-
-  /**
-   * Renderiza una orientación completa
-   */
-  renderizar(orientacion = {}) {
+  renderizar(componenteRaiz) {
     this.limpiar();
+    if (componenteRaiz) {
+      componenteRaiz.motor = this;
+      const elementoDOM = componenteRaiz.render();
+      this.contenedor.appendChild(elementoDOM);
 
-    if (orientacion.title) {
-      document.title = orientacion.title;
-      const tituloHeader = document.getElementById('app-title');
-      if (tituloHeader) {
-        tituloHeader.textContent = orientacion.title;
+      if (typeof componenteRaiz.vincularEventos === 'function') {
+        componenteRaiz.vincularEventos();
       }
-    }
-
-    const componentes = orientacion.components || [];
-    componentes.forEach((config) => {
-      const instancia = this.crearComponente(config);
-      if (instancia) {
-        const elemento = instancia.render();
-        this.contenedor.appendChild(elemento);
-        instancia.vincularEventos();
-        this.instancias.push(instancia);
-      }
-    });
-
-    if (orientacion.onLoad && Array.isArray(orientacion.onLoad)) {
-      this.ejecutarAcciones(orientacion.onLoad);
+      this.instancias.push(componenteRaiz);
     }
   }
 
-  /**
-   * Crea una instancia de componente
-   */
-  crearComponente(config) {
-    if (!config || !config.type) {
-      console.warn('Configuración de componente inválida:', config);
-      return null;
-    }
-
-    const Clase = this.componentesRegistrados[config.type];
-    if (!Clase) {
-      console.warn(`Componente no registrado: "${config.type}"`);
-      return null;
-    }
-
-    return new Clase(config, this);
-  }
-
-  /**
-   * Limpia el contenedor y destruye las instancias actuales
-   */
   limpiar() {
     this.instancias.forEach((instancia) => {
       if (typeof instancia.destruir === 'function') {
@@ -85,61 +38,37 @@ export class Motor {
   }
 
   /**
-   * Ejecuta una o varias acciones.
-   * Acepta tanto un array de acciones como una sola acción.
+   * ÚNICO PUNTO DE ENTRADA PARA ACCIONES
    */
-  ejecutarAcciones(acciones = []) {
-    const lista = Array.isArray(acciones) ? acciones : [acciones];
+  async ejecutarAcciones(acciones) {
+    if (!acciones) return [];
 
-    lista.forEach((configAccion) => {
+    const lista = Array.isArray(acciones) ? acciones : [acciones];
+    const resultados = [];
+
+    for (const configAccion of lista) {
       if (configAccion && typeof configAccion === 'object') {
-        this.ejecutarAccion(configAccion);
+        try {
+          const resultado = await this._ejecutarUnaAccion(configAccion);
+          resultados.push(resultado);
+        } catch (error) {
+          console.error('Error al ejecutar la acción:', configAccion, error);
+          throw error;
+        }
       } else {
         console.warn('Acción inválida recibida:', configAccion);
       }
-    });
-  }
-
-  /**
-   * Ejecuta una sola acción
-   */
-  ejecutarAccion(configAccion, contexto = {}) {
-    const accion = new Accion(configAccion, this);
-    return accion.ejecutar(contexto); // ← importante: devolvemos la promesa
-  }
-
-  /**
-   * Método principal de inicio de la aplicación
-   */
-  async inicio() {
-    const estaInstalada =
-      window.matchMedia('(display-mode: standalone)').matches ||
-      window.navigator.standalone === true;
-
-    console.log(`Estado PWA - Standalone: ${estaInstalada}`);
-
-
-
-    
-    try {
-      
-      await this.ejecutarAccion({
-        type: 'callApi',
-        payload: {
-          modulo: 'inicio',
-          accion: 'cargarVista',
-          payload: estaInstalada
-        }
-      });
-      console.log("DEBUG - window.TOKEN actual:", window.TOKEN);
-    } catch (error) {
-      console.error('Error al cargar la vista de inicio:', error);
-      // Fallback
-      
     }
-  }
-  // ====================== TOKEN ======================
 
+    return resultados;
+  }
+
+  _ejecutarUnaAccion(configAccion, contexto = {}) {
+    const accion = new Accion(configAccion, this);
+    return accion.ejecutar(contexto);
+  }
+
+  // ====================== TOKEN ======================
   setToken(token) {
     if (token === null || token === undefined) {
       localStorage.removeItem('truckero_token');
