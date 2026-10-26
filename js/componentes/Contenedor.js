@@ -3,7 +3,7 @@ import { Componente } from '../motor/Componente.js';
 export class Contenedor extends Componente {
 
   constructor(config, motor) {
-    super(config, motor, 'div');
+    super(config, motor, tag);
   }
 
   render() {
