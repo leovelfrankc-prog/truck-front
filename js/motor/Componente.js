@@ -26,7 +26,42 @@ export class Componente {
   crearElemento() {
     return document.createElement(this.tag);
   }
+/**
+ * Renderiza los componentes hijos definidos en config.components
+ * dentro del contenedor recibido.
+ *
+ * @param {HTMLElement} contenedor
+ */
+renderizarHijos(contenedor) {
 
+  if (
+    !contenedor ||
+    !Array.isArray(this.config.components)
+  ) {
+    return;
+  }
+
+  this.config.components.forEach((hijoConfig) => {
+
+    const hijo =
+      this.motor.crearComponente(hijoConfig);
+
+    if (!hijo) return;
+
+    const elementoHijo =
+      hijo.render();
+
+    contenedor.appendChild(
+      elementoHijo
+    );
+
+    this.motor.instancias.push(
+      hijo
+    );
+
+  });
+
+}
   /**
    * Aplica atributos comunes a todos los componentes.
    */
