@@ -20,24 +20,7 @@ export class Card extends Componente {
     body.className =
       this.config.props?.bodyClass || 'card-body';
 
-    if (Array.isArray(this.config.components)) {
-
-      this.config.components.forEach((hijoConfig) => {
-
-        const hijo =
-          this.motor.crearComponente(hijoConfig);
-
-        if (!hijo) return;
-
-        const elementoHijo = hijo.render();
-
-        body.appendChild(elementoHijo);
-
-        this.motor.instancias.push(hijo);
-
-      });
-
-    }
+    this.renderizarHijos(body);
 
     this.elemento.appendChild(body);
 
