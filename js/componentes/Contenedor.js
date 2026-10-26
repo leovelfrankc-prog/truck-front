@@ -1,32 +1,22 @@
 import { Componente } from '../motor/Componente.js';
 
 export class Contenedor extends Componente {
+
+  constructor(config, motor) {
+    super(config, motor, 'div');
+  }
+
   render() {
-    this.elemento = document.createElement('div');
 
-    // Clases
-    if (this.config.props?.class) {
-      this.elemento.className = this.config.props.class;
-    }
+    this.elemento = this.crearElemento();
 
-    // ID
-    if (this.id) {
-      this.elemento.id = this.id;
-    }
+    this.aplicarAtributosBase();
 
-    // Renderizar componentes hijos
-    if (Array.isArray(this.config.components)) {
-      this.config.components.forEach((hijoConfig) => {
-        const hijo = this.motor.crearComponente(hijoConfig);
-        if (hijo) {
-          const elementoHijo = hijo.render();
-          this.elemento.appendChild(elementoHijo);
-          hijo.vincularEventos();
-          this.motor.instancias.push(hijo);
-        }
-      });
-    }
+    this.renderizarHijos(this.elemento);
+
+    this.vincularEventos();
 
     return this.elemento;
   }
+
 }
