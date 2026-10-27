@@ -1,10 +1,12 @@
 import { Accion } from './Accion.js';
-import * as Componentes from '../componentes/index.js'; // Tu archivo barrel
 
 export class Motor {
   constructor(contenedorId = 'view-content') {
     this.contenedor = document.getElementById(contenedorId);
     this.instancias = [];
+    
+    // Diccionario para almacenar los componentes registrados
+    this.componentesRegistry = {};
 
     if (!this.contenedor) {
       console.error(`No se encontró el contenedor con id "${contenedorId}"`);
@@ -12,24 +14,48 @@ export class Motor {
   }
 
   /**
-   * MÉTODO FÁBRICA: Crea el componente y le inyecta el motor automáticamente.
-   * @param {string} tipo - Nombre de la clase (ej: "Contenedor", "Boton", "Alerta")
-   * @param {Object} config - Configuración del componente (props, actions, etc.)
+   * Registra un componente en el motor asociándolo a una clave (ej: 'text', 'button')
+   * @param {string} tipo - Clave identificadora del componente
+   * @param {Class} claseComponente - La clase del componente
    */
-  crearComponente(tipo, config = {}) {
-    const ClaseComponente = Componentes[tipo];
+  registrar(tipo, claseComponente) {
+    this.componentesRegistry[tipo] = claseComponente;
+  }
 
-    if (!ClaseComponente) {
-      console.error(`El componente "${tipo}" no está registrado en el motor.`);
+  /**
+   * Crea una instancia de un componente registrado
+   * @param {string|Object} tipoOConfig - Puede ser el string del tipo ('text') o un objeto de config ({ type: 'text', props: {} })
+   * @param {Object} propsOConfig - Las propiedades o configuración del componente
+   */
+  crearComponente(tipoOConfig, propsOConfig = {}) {
+    let tipo;
+    let config;
+
+    // Soporta tanto motor.crearComponente('text', { text: 'Hola' }) 
+    // como motor.crearComponente({ type: 'text', props: { text: 'Hola' } })
+    if (typeof tipoOConfig === 'string') {
+      tipo = tipoOConfig;
+      config = { type: tipo, props: propsOConfig };
+    } else if (tipoOConfig && typeof tipoOConfig === 'object') {
+      tipo = tipoOConfig.type;
+      config = tipoOConfig;
+    } else {
+      console.warn('Parámetro inválido para crearComponente:', tipoOConfig);
       return null;
     }
 
-    // ¡Aquí ocurre la magia! Le pasamos la config y 'this' (el motor) automáticamente
+    const ClaseComponente = this.componentesRegistry[tipo];
+
+    if (!ClaseComponente) {
+      console.error(`El componente de tipo "${tipo}" no está registrado en el motor.`);
+      return null;
+    }
+
+    // Instancia la clase pasándole la configuración y 'this' (el motor)
     return new ClaseComponente(config, this);
   }
 
-  
- renderizar(componenteRaiz) {
+  renderizar(componenteRaiz) {
     this.limpiar();
     if (componenteRaiz) {
       componenteRaiz.motor = this;
@@ -56,9 +82,6 @@ export class Motor {
     }
   }
 
-  /**
-   * ÚNICO PUNTO DE ENTRADA PARA ACCIONES
-   */
   async ejecutarAcciones(acciones) {
     if (!acciones) return [];
 
