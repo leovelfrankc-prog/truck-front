@@ -1,8 +1,12 @@
 import { Componente } from '../motor/Componente.js';
 
 export class Boton extends Componente {
+  constructor(config, motor) {
+    super(config, motor, config?.props?.tag || 'button');
+  }
+
   render() {
-    this.elemento = document.createElement('button');
+    this.elemento = this.crearElemento();
     this.elemento.type = this.config.props?.type || 'button';
 
     // Clases (Bootstrap por defecto)
@@ -16,10 +20,9 @@ export class Boton extends Componente {
       this.elemento.disabled = true;
     }
 
-    // ID
-    if (this.id) {
-      this.elemento.id = this.id;
-    }
+    // Heredamos los atributos base (ID, estilos, etc.) y los eventos (actions)
+    this.aplicarAtributosBase();
+    this.vincularEventos();
 
     return this.elemento;
   }
