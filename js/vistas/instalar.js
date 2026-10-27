@@ -8,30 +8,28 @@ import { Boton } from '../componentes/boton.js';
 import { Alerta } from '../componentes/alerta.js';
 
 export function vistaInstalar(motor) {
-  // 1. Crear el contenedor principal (con tag 'section')
-  const contenedor = new Contenedor({}, window.motor(), "section");
+  // 1. Contenedor configurado para usar la etiqueta 'section' a través de props
+  const contenedor = new Contenedor({ props: { tag: 'section' } }, motor);
   const elementoContenedor = contenedor.render();
 
-  // 2. Crear los componentes hijos con sus configuraciones y tags correctos
+  // 2. Alerta (su clase ya sabe que por defecto es un div)
   const pruebaAlerta = new Alerta(
     { props: { text: "¡Bienvenido a la versión de prueba de Truckero!" } }, 
-    window.motor(), 
-    "div"
+    motor
   );
 
+  // 3. Botón (su clase ya sabe que por defecto es un button)
   const btnInstalar = new Boton(
     { 
       props: { text: "Instalar aplicación" },
       actions: [{ event: "click", action: "instalarApp" }] 
     }, 
-    window.motor(), 
-    "button" // Corregido: "button" en lugar de "buttom"
+    motor
   );
 
-  // 3. Añadir los elementos hijos al DOM del contenedor
+  // 4. Añadir los elementos hijos al DOM del contenedor
   elementoContenedor.appendChild(pruebaAlerta.render());
   elementoContenedor.appendChild(btnInstalar.render());
 
-  // 4. Retornar el elemento listo para ser renderizado por el motor
   return elementoContenedor;
 }
