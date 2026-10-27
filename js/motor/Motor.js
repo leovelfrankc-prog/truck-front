@@ -1,9 +1,11 @@
 import { Accion } from './Accion.js';
+import { crearVista } from '../vistas.js';
 
 export class Motor {
   constructor(contenedorId = 'view-content') {
     this.contenedor = document.getElementById(contenedorId);
     this.instancias = [];
+    this.vistas={};
     
     // Diccionario para almacenar los componentes registrados
     this.componentesRegistry = {};
@@ -20,6 +22,10 @@ export class Motor {
    */
   registrar(tipo, claseComponente) {
     this.componentesRegistry[tipo] = claseComponente;
+  }
+  registrarVista(vista) {
+    const htmlVista = crearVista(vista);
+    this.vistas[vista] = htmlVista;
   }
 
   /**
