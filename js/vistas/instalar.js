@@ -3,81 +3,35 @@
  * Función de arranque - Versión de prueba
  */
 
-import { crearMotor } from '../motor/registro.js';
+import { Contenedor } from '../componentes/contenedor.js';
+import { Boton } from '../componentes/boton.js';
+import { Alerta } from '../componentes/alerta.js';
 
-/**
- * Punto de entrada de la aplicación
- */
-export async function inicio() {
-  console.log('Iniciando aplicación (modo prueba)...');
+export function vistaInstalar(motor) {
+  // 1. Crear el contenedor principal (con tag 'section')
+  const contenedor = new Contenedor({}, window.motor(), "section");
+  const elementoContenedor = contenedor.render();
 
-  // 1. Crear el motor
-  const motor = crearMotor('view-content');
+  // 2. Crear los componentes hijos con sus configuraciones y tags correctos
+  const pruebaAlerta = new Alerta(
+    { props: { text: "¡Bienvenido a la versión de prueba de Truckero!" } }, 
+    window.motor(), 
+    "div"
+  );
 
-  // 2. Orientación de prueba
-  const orientacionPrueba = {
-    title: 'Prueba del Motor',
-    components: [
-      {
-        type: 'container',
-        props: {
-          class: 'row justify-content-center mt-4'
-        },
-        components: [
-          {
-            type: 'card',
-            props: {
-              class: 'card shadow-sm col-md-6'
-            },
-            components: [
-              {
-                type: 'text',
-                props: {
-                  tag: 'h3',
-                  text: 'Motor funcionando',
-                  class: 'text-center mb-3'
-                }
-              },
-              {
-                type: 'text',
-                props: {
-                  text: 'Si puedes ver este mensaje, el motor de orientaciones está renderizando correctamente.',
-                  class: 'text-muted text-center mb-4'
-                }
-              },
-              {
-                type: 'alert',
-                props: {
-                  type: 'success',
-                  text: 'Componentes cargados: text, button, card, container, alert'
-                }
-              },
-              {
-                type: 'button',
-                props: {
-                  text: '<i class="bi bi-check-circle me-2"></i> Botón de prueba',
-                  class: 'btn btn-primary w-100 mt-3'
-                },
-                actions: [
-                  {
-                    event: 'click',
-                    type: 'showToast',
-                    payload: {
-                      message: '¡El botón funciona!',
-                      type: 'success'
-                    }
-                  }
-                ]
-              }
-            ]
-          }
-        ]
-      }
-    ]
-  };
+  const btnInstalar = new Boton(
+    { 
+      props: { text: "Instalar aplicación" },
+      actions: [{ event: "click", action: "instalarApp" }] 
+    }, 
+    window.motor(), 
+    "button" // Corregido: "button" en lugar de "buttom"
+  );
 
-  // 3. Renderizar la orientación de prueba
-  motor.renderizar(orientacionPrueba);
+  // 3. Añadir los elementos hijos al DOM del contenedor
+  elementoContenedor.appendChild(pruebaAlerta.render());
+  elementoContenedor.appendChild(btnInstalar.render());
 
-  console.log('Orientación de prueba renderizada');
+  // 4. Retornar el elemento listo para ser renderizado por el motor
+  return elementoContenedor;
 }
