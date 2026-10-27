@@ -1,4 +1,5 @@
 import { Accion } from './Accion.js';
+import * as Componentes from '../componentes/index.js'; // Tu archivo barrel
 
 export class Motor {
   constructor(contenedorId = 'view-content') {
@@ -10,7 +11,25 @@ export class Motor {
     }
   }
 
-  renderizar(componenteRaiz) {
+  /**
+   * MÉTODO FÁBRICA: Crea el componente y le inyecta el motor automáticamente.
+   * @param {string} tipo - Nombre de la clase (ej: "Contenedor", "Boton", "Alerta")
+   * @param {Object} config - Configuración del componente (props, actions, etc.)
+   */
+  crearComponente(tipo, config = {}) {
+    const ClaseComponente = Componentes[tipo];
+
+    if (!ClaseComponente) {
+      console.error(`El componente "${tipo}" no está registrado en el motor.`);
+      return null;
+    }
+
+    // ¡Aquí ocurre la magia! Le pasamos la config y 'this' (el motor) automáticamente
+    return new ClaseComponente(config, this);
+  }
+
+  
+ renderizar(componenteRaiz) {
     this.limpiar();
     if (componenteRaiz) {
       componenteRaiz.motor = this;
