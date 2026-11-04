@@ -4,11 +4,14 @@
 export class Componente {
 
   constructor(config, motor, tag = 'div') {
-    this.tag = tag;
     this.config = config || {};
-    this.motor = motor;
-    this.elemento = null;
-    this.id = this.config.id || null;
+    this.motor = motor; // <--- ¡Restaurado para la comunicación y eventos!
+    this.elemento = document.createElement(tag);
+
+    // Asignación limpia del ID solo si existe en la config
+    if (this.config.id) {
+      this.elemento.id = this.config.id;
+    }
   }
 
   /**
@@ -21,58 +24,10 @@ export class Componente {
   }
 
   /**
-   * Crea el elemento HTML asociado al componente.
-   */
-  crearElemento() {
-    return document.createElement(this.tag);
-  }
-/**
- * Renderiza los componentes hijos definidos en config.components
- * dentro del contenedor recibido.
- *
- * @param {HTMLElement} contenedor
- */
-renderizarHijos(contenedor) {
-
-  if (
-    !contenedor ||
-    !Array.isArray(this.config.components)
-  ) {
-    return;
-  }
-
-  this.config.components.forEach((hijoConfig) => {
-
-    const hijo =
-      this.motor.crearComponente(hijoConfig);
-
-    if (!hijo) return;
-
-    const elementoHijo =
-      hijo.render();
-
-    contenedor.appendChild(
-      elementoHijo
-    );
-
-    this.motor.instancias.push(
-      hijo
-    );
-
-  });
-
-}
-  /**
    * Aplica atributos comunes a todos los componentes.
    */
   aplicarAtributosBase() {
-
     if (!this.elemento) return;
-
-    // ID
-    if (this.id) {
-      this.elemento.id = this.id;
-    }
 
     // Clases CSS
     if (this.config.props?.class) {
@@ -96,12 +51,10 @@ renderizarHijos(contenedor) {
 
     // Atributos personalizados
     if (this.config.props?.attributes) {
-
       Object.entries(this.config.props.attributes)
         .forEach(([nombre, valor]) => {
           this.elemento.setAttribute(nombre, valor);
         });
-
     }
   }
 
@@ -109,7 +62,6 @@ renderizarHijos(contenedor) {
    * Vincula eventos definidos en la configuración.
    */
   vincularEventos() {
-
     if (
       !this.config.actions ||
       !Array.isArray(this.config.actions) ||
@@ -119,20 +71,19 @@ renderizarHijos(contenedor) {
     }
 
     this.config.actions.forEach((accionConfig) => {
-
       const evento = accionConfig.event || 'click';
 
       this.elemento.addEventListener(evento, (e) => {
-
         if (accionConfig.preventDefault) {
           e.preventDefault();
         }
 
+        // Aquí es donde el componente usa 'this.motor' gracias al constructor
         if (
           this.motor &&
-          typeof this.motor.ejecutarAccion === 'function'
+          typeof this.motor.ejecutarAcciones === 'function' // Asegúrate de que coincida con el nombre en tu Motor.js ('ejecutarAcciones')
         ) {
-          this.motor.ejecutarAccion(
+          this.motor.ejecutarAcciones(
             accionConfig,
             {
               componente: this,
@@ -140,11 +91,8 @@ renderizarHijos(contenedor) {
             }
           );
         }
-
       });
-
     });
-
   }
 
   /**
@@ -158,14 +106,12 @@ renderizarHijos(contenedor) {
    * Elimina el componente del DOM.
    */
   destruir() {
-
     if (
       this.elemento &&
       this.elemento.parentNode
     ) {
       this.elemento.remove();
     }
-
     this.elemento = null;
   }
 
