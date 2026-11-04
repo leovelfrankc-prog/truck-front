@@ -4,10 +4,14 @@ import { crearVista } from '../vistas.js';
 export class Motor {
   constructor(contenedorId = 'view-content') {
     this.contenedor = document.getElementById(contenedorId);
-    this.instancias = [];
-    this.vistas={};
     
-    // Diccionario para almacenar los componentes registrados
+    // Almacena las instancias de componentes activos en la vista actual
+    this.instancias = [];
+    
+    // Diccionario para almacenar las VISTAS instanciadas por rol/nombre
+    this.vistas = {};
+    
+    // Diccionario para almacenar los componentes registrados ('input', 'button', etc.)
     this.componentesRegistry = {};
 
     if (!this.contenedor) {
@@ -16,29 +20,54 @@ export class Motor {
   }
 
   /**
-   * Registra un componente en el motor asociándolo a una clave (ej: 'text', 'button')
-   * @param {string} tipo - Clave identificadora del componente
-   * @param {Class} claseComponente - La clase del componente
+   * Registra un componente en el motor asociándolo a una clave (ej: 'input', 'button')
    */
   registrar(tipo, claseComponente) {
     this.componentesRegistry[tipo] = claseComponente;
   }
-  registrarVista(vista) {
-    const htmlVista = crearVista(vista);
-    this.vistas[vista] = htmlVista;
+
+  /**
+   * Pre-instancia y registra una vista en la memoria del motor (Ideal para RBAC)
+   */
+  registrarVista(nombreVista) {
+    // Le pasamos 'this' (el motor) para que la vista nazca conectada
+    const instanciaVista = crearVista(nombreVista, this);
+    if (instanciaVista) {
+      this.vistas[nombreVista] = instanciaVista;
+    }
   }
 
   /**
-   * Crea una instancia de un componente registrado
-   * @param {string|Object} tipoOConfig - Puede ser el string del tipo ('text') o un objeto de config ({ type: 'text', props: {} })
-   * @param {Object} propsOConfig - Las propiedades o configuración del componente
+   * Cambia la vista activa en pantalla utilizando las vistas ya instanciadas en memoria
+   */
+  cambiarVista(nombreVista) {
+    const vista = this.vistas[nombreVista];
+    
+    if (!vista) {
+      console.error(`La vista "${nombreVista}" no está registrada o no tienes permisos.`);
+      return;
+    }
+
+    // 1. Limpiamos el contenedor DOM principal (pero SIN destruir las vistas en memoria)
+    if (this.contenedor) {
+      this.contenedor.innerHTML = '';
+    }
+
+    // 2. Renderizamos la vista y la insertamos en el DOM
+    const elementoDOM = vista.render();
+    this.contenedor.appendChild(elementoDOM);
+
+    // Guardamos la referencia de la vista actual si lo necesitas
+    this.vistaActual = vista;
+  }
+
+  /**
+   * Crea una instancia de un componente registrado (mantiene tu lógica original excelente)
    */
   crearComponente(tipoOConfig, propsOConfig = {}) {
     let tipo;
     let config;
 
-    // Soporta tanto motor.crearComponente('text', { text: 'Hola' }) 
-    // como motor.crearComponente({ type: 'text', props: { text: 'Hola' } })
     if (typeof tipoOConfig === 'string') {
       tipo = tipoOConfig;
       config = { type: tipo, props: propsOConfig };
@@ -57,32 +86,14 @@ export class Motor {
       return null;
     }
 
-    // Instancia la clase pasándole la configuración y 'this' (el motor)
     return new ClaseComponente(config, this);
   }
 
-  renderizar(componenteRaiz) {
-    this.limpiar();
-    if (componenteRaiz) {
-      componenteRaiz.motor = this;
-      const elementoDOM = componenteRaiz.render();
-      this.contenedor.appendChild(elementoDOM);
-
-      if (typeof componenteRaiz.vincularEventos === 'function') {
-        componenteRaiz.vincularEventos();
-      }
-      this.instancias.push(componenteRaiz);
-    }
-  }
-
-  limpiar() {
-    this.instancias.forEach((instancia) => {
-      if (typeof instancia.destruir === 'function') {
-        instancia.destruir();
-      }
-    });
-    this.instancias = [];
-
+  /**
+   * Limpia la aplicación al cerrar sesión
+   */
+  destruirTodo() {
+    this.vistas = {};
     if (this.contenedor) {
       this.contenedor.innerHTML = '';
     }
