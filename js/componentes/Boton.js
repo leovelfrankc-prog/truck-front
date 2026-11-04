@@ -1,29 +1,35 @@
-import { Componente } from '../motor/Componente.js';
+import { Componente } from './Componente.js';
 
+/**
+ * Clase Boton: Componente hoja para acciones e interacciones del usuario.
+ */
 export class Boton extends Componente {
   constructor(config, motor) {
-    super(config, motor, config?.props?.tag || 'button');
+    // Hereda de Componente y define el tag HTML como 'button'
+    super(config, motor, 'button');
   }
 
   render() {
-    this.elemento = this.crearElemento();
-    this.elemento.type = this.config.props?.type || 'button';
+    // 1. Tipo de botón ('button', 'submit', 'reset') por defecto 'button'
+    const tipoBoton = this.config.props?.type || 'button';
+    this.elemento.type = tipoBoton;
 
-    // Clases (Bootstrap por defecto)
-    this.elemento.className = this.config.props?.class || 'btn btn-primary';
+    // 2. Texto o etiqueta interna del botón
+    const textoBoton = this.config.props?.text || 'Botón';
+    this.elemento.textContent = textoBoton;
 
-    // Contenido (soporta HTML para iconos)
-    this.elemento.innerHTML = this.config.props?.text || 'Botón';
-
-    // Disabled
+    // 3. Estado deshabilitado si viene configurado
     if (this.config.props?.disabled) {
       this.elemento.disabled = true;
     }
 
-    // Heredamos los atributos base (ID, estilos, etc.) y los eventos (actions)
+    // 4. Aplicamos atributos base comunes (clases CSS, estilos, ID, etc.)
     this.aplicarAtributosBase();
+
+    // 5. Vinculamos los eventos (el click que dispara la acción en el motor)
     this.vincularEventos();
 
+    // 6. Retornamos el elemento DOM listo
     return this.elemento;
   }
 }
