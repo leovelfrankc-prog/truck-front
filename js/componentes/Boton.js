@@ -1,4 +1,4 @@
-import { Componente } from './Componente.js';
+import { Componente } from '/truck-front/js/componentes/Componente.js';
 
 /**
  * Clase Boton: Componente hoja para acciones e interacciones del usuario.
