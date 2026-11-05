@@ -1,5 +1,5 @@
 import { Accion } from '/truck-front/js/motor/Accion.js';
-import { crearVista } from '/truck-front/js/vistas.js';
+import { crearVista } from '/truck-front/js/vistas/vistas.js';
 
 export class Motor {
   constructor(contenedorId = 'view-content') {
