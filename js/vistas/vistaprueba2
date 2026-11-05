@@ -1,5 +1,5 @@
 import { Contenedor } from '../componentes/Contenedor.js';
-import { Input } from '../componentes/Input.js';
+import { Input } from '../componentes/inputs.js';
 import { Boton } from '../componentes/Boton.js';
 
 /**
