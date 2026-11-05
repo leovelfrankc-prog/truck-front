@@ -1,6 +1,6 @@
-import { Contenedor } from '/truck-front/js/componentes/Contenedor.js';
-import { Input } from '/truck-front/js/componentes/Input.js';
-import { Boton } from '/truck-front/js/componentes/Boton.js';
+import { Contenedor } from '../componentes/Contenedor.js';
+import { Input } from '../componentes/inputs.js';
+import { Boton } from '../componentes/Boton.js';
 
 /**
  * VistaPrueba: Vista de ejemplo que contiene un formulario con un input y un botón.
