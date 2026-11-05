@@ -1,0 +1,79 @@
+import { Contenedor } from '/truck-front/js/componentes/Contenedor.js';
+import { Input } from '/truck-front/js/componentes/Input.js';
+import { Boton } from '/truck-front/js/componentes/Boton.js';
+
+/**
+ * VistaPrueba: Vista de ejemplo que contiene un formulario con un input y un botón.
+ */
+export class Prueba {
+  constructor(motor) {
+    this.motor = motor;
+    this.contenedorPrincipal = null;
+    this.formulario = null;
+    
+    // Instanciamos los elementos de manera independiente
+    this.crearElementos();
+  }
+
+  crearElementos() {
+    // 1. Creamos el Input de texto
+    const inputNombre = new Input({
+      id: 'nombreUsuario',
+      props: {
+        type: 'text',
+        placeholder: 'Escribe tu nombre aquí...',
+        class: 'form-input'
+      }
+    }, this.motor);
+
+    // 2. Creamos el Botón de envío
+    const botonEnviar = new Boton({
+      id: 'btnEnviar',
+      props: {
+        type: 'button',
+        text: 'Guardar y Enviar',
+        class: 'btn-primary'
+      },
+      // Definimos la acción que disparará en el Motor cuando hagan clic
+      actions: [
+        {
+          event: 'click',
+          preventDefault: true,
+          action: 'procesarFormularioPrueba' // Nombre del método que manejará el Motor
+        }
+      ]
+    }, this.motor);
+
+    // 3. Creamos el Contenedor (formulario) que agrupa los elementos anteriores
+    this.formulario = new Contenedor({
+      props: {
+        tag: 'form',
+        class: 'mi-formulario-card'
+      },
+      components: [inputNombre, botonEnviar]
+    }, this.motor);
+
+    // 4. Creamos un contenedor raíz para la vista completa
+    this.contenedorPrincipal = new Contenedor({
+      props: {
+        tag: 'div',
+        class: 'vista-container'
+      },
+      components: [this.formulario]
+    }, this.motor);
+  }
+
+  /**
+   * Método que devuelve el elemento DOM listo para que el Motor lo pinte
+   */
+  render() {
+    return this.contenedorPrincipal.render();
+  }
+
+  /**
+   * Método útil para extraer los datos de los hijos cuando se requiera
+   */
+  obtenerDatos() {
+    return this.formulario.obtenerDatosHijos();
+  }
+}
