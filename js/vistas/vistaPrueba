@@ -5,7 +5,7 @@ import { Boton } from '/truck-front/js/componentes/Boton.js';
 /**
  * VistaPrueba: Vista de ejemplo que contiene un formulario con un input y un botón.
  */
-export class VistaPrueba {
+export class prueba {
   constructor(motor) {
     this.motor = motor;
     this.contenedorPrincipal = null;
