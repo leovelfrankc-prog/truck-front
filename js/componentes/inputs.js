@@ -1,4 +1,4 @@
-import { Componente } from './Componente.js';
+import { Componente } from '/truck-front/js/componentes/Componente.js';
 
 /**
  * Clase Input: Componente universal para entradas de texto, números o archivos/imágenes.
