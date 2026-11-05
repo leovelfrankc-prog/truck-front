@@ -6,13 +6,13 @@
 import { Motor } from '/truck-front/js/motor/Motor.js';
 
 // Importamos todos los componentes
-import { Texto } from '../componentes/Texto.js';
-import { Boton } from '../componentes/Boton.js';
-import { Card } from '../componentes/Card.js';
-import { Contenedor } from '../componentes/Contenedor.js';
-import { Alerta } from '../componentes/Alerta.js';
-import { Input } from '../componentes/inputs.js';
-import { Formulario } from '../componentes/formulario.js';
+import { Texto } from '/truck-front/js/componentes/Texto.js';
+import { Boton } from '/truck-front/js/componentes/Boton.js';
+import { Card } from '/truck-front/js/componentes/Card.js';
+import { Contenedor } from '/truck-front/js/componentes/Contenedor.js';
+import { Alerta } from '/truck-front/js/componentes/Alerta.js';
+import { Input } from '/truck-front/js/componentes/inputs.js';
+import { Formulario } from '/truck-front/js/componentes/formulario.js';
 
 /**
  * Crea una instancia del motor y registra los componentes disponibles.
