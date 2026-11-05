@@ -129,11 +129,11 @@
 
   <!-- Motor + Aplicación -->
 <script type="module">
-  import { crearMotor } from '/truck-front/js/motor/registro.js';
+  import { Motor } from '/truck-front/js/motor/Motor.js';
 
   document.addEventListener('DOMContentLoaded', () => {
     // 1. Inicializamos el motor globalmente
-    window.motor = crearMotor('view-content');
+    window.motor = new Motor();
 
     // 2. Si el motor ya tiene un token guardado, puedes opcionalmente loguearlo o validarlo aquí
     if (window.motor.hasToken()) {
