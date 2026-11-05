@@ -1,4 +1,4 @@
-import { Componente } from '/truck-front/js/motor/Componente.js';
+import { Componente } from '../motor/Componente.js';
 
 /**
  * Clase Contenedor: Agrupa componentes ya instanciados previamente,
