@@ -1,4 +1,4 @@
-import { Prueba } from './vistas/vistaPrueba.js'; // Importamos con la clase en Mayúscula
+import { Prueba } from './vistas/vistaprueba.js'; // Importamos con la clase en Mayúscula
 
 export function crearVista(vista, motor) { // Recibimos el motor por parámetro
   switch (vista) {
